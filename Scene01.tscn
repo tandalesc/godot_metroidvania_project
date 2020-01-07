@@ -66,6 +66,7 @@ tile_data = PoolIntArray( -1245155, 3, 10, -1245143, 3, 10, -1179619, 3, 65547, 
 color = Color( 0.313726, 0.313726, 0.313726, 1 )
 
 [node name="Lights" type="Node2D" parent="World"]
+editor/display_folded = true
 
 [node name="Torch1" type="Light2D" parent="World/Lights"]
 position = Vector2( 231.444, -55.7009 )
