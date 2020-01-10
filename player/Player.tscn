@@ -160,7 +160,7 @@ graph_offset = Vector2( 0, 134.778 )
 [sub_resource type="AnimationNodeStateMachinePlayback" id=24]
 
 [sub_resource type="RectangleShape2D" id=25]
-extents = Vector2( 6.16655, 14.9799 )
+extents = Vector2( 7.10197, 14.8997 )
 
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 23.0792, -2.39501 )
@@ -170,6 +170,7 @@ script = ExtResource( 1 )
 texture = ExtResource( 2 )
 vframes = 16
 hframes = 7
+frame = 1
 region_enabled = true
 region_rect = Rect2( 0, 0, 350, 592 )
 

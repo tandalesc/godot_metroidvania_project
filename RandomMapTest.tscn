@@ -1,0 +1,71 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://world/tilemap/default_tileset.tres" type="TileSet" id=1]
+[ext_resource path="res://world/tilemap/WorldGeneration.gd" type="Script" id=2]
+[ext_resource path="res://player/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://world/lights/light.png" type="Texture" id=4]
+[ext_resource path="res://entities/powerups/DoubleJumpPowerup.tscn" type="PackedScene" id=5]
+[ext_resource path="res://world/fog.shader" type="Shader" id=6]
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=1]
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = ExtResource( 6 )
+shader_param/color = Color( 0.14902, 0.14902, 0.14902, 0.533333 )
+shader_param/min_opacity = 0.0
+shader_param/uv_scale = 7.0
+shader_param/time_scale = 0.08
+shader_param/fbm_octaves = 6
+shader_param/fbm_scale = 0.7
+
+[node name="RandomMapTest" type="Node2D"]
+
+[node name="RandomizedTileMap" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+script = ExtResource( 2 )
+density = 0.55
+starvation_limit = 4.6
+birth_limit = 8.0
+overpop_limit = 10.0
+stages = 3
+
+[node name="Player" parent="." instance=ExtResource( 3 )]
+
+[node name="Sprite" parent="Player" index="0"]
+frame = 1
+
+[node name="AnimationTree" parent="Player" index="2"]
+parameters/playback = SubResource( 1 )
+
+[node name="Camera2D" parent="Player" index="4"]
+zoom = Vector2( 0.5, 0.5 )
+
+[node name="Light2D" type="Light2D" parent="Player"]
+texture = ExtResource( 4 )
+texture_scale = 0.3
+shadow_enabled = true
+shadow_buffer_size = 1024
+shadow_gradient_length = 35.0
+
+[node name="DoubleJumpPowerup" parent="." instance=ExtResource( 5 )]
+position = Vector2( 24.5234, 62.2484 )
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color( 0.352941, 0.352941, 0.352941, 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 0
+scale = Vector2( 4, 4 )
+transform = Transform2D( 4, 0, 0, 4, 0, 0 )
+
+[node name="Fog" type="ColorRect" parent="CanvasLayer"]
+light_mask = 0
+material = SubResource( 2 )
+margin_left = -285.0
+margin_top = -196.0
+margin_right = 322.0
+margin_bottom = 190.0
+
+[editable path="Player"]

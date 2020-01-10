@@ -1,7 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=2]
-
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
+shader_type canvas_item;
 
 uniform vec4 color : hint_color;
 uniform float min_opacity = 0.0;
@@ -48,13 +45,4 @@ void fragment() {
 	vec2 motion = vec2(fbm(scaled_coord + vec2(-0.2*scaled_time, scaled_time)));
 	float final = fbm(scaled_coord * motion);
 	COLOR = vec4(color.rgb, max(final*color.a, min_opacity));
-}"
-
-[resource]
-shader = SubResource( 1 )
-shader_param/color = Color( 0, 0.4, 0.87451, 0.658824 )
-shader_param/min_opacity = 0.2
-shader_param/uv_scale = 6.0
-shader_param/time_scale = 0.1
-shader_param/fbm_octaves = 5
-shader_param/fbm_scale = 0.6
+}
