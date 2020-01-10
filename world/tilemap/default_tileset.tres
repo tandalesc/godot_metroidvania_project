@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=136 format=2]
+[gd_resource type="TileSet" load_steps=137 format=2]
 
 [ext_resource path="res://world/tilemap/s4m_ur4i-metroidvania-1.3.png" type="Texture" id=1]
 
@@ -335,6 +335,9 @@ points = PoolVector2Array( 0, 0, 16, 0, 16, 16, 0, 16 )
 [sub_resource type="ConvexPolygonShape2D" id=111]
 points = PoolVector2Array( 0, 0, 16, 0, 16, 16, 0, 16 )
 
+[sub_resource type="ConvexPolygonShape2D" id=135]
+points = PoolVector2Array( 0, 0, 16, 0, 16, 16, 0, 16 )
+
 [sub_resource type="ConvexPolygonShape2D" id=112]
 points = PoolVector2Array( 0, 16, 16, 0, 16, 16 )
 
@@ -413,7 +416,7 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 0/tile_mode = 1
 0/autotile/bitmask_mode = 0
 0/autotile/bitmask_flags = [ Vector2( 0, 0 ), 79, Vector2( 0, 1 ), 73, Vector2( 0, 2 ), 457, Vector2( 1, 0 ), 7, Vector2( 1, 1 ), 495, Vector2( 1, 2 ), 448, Vector2( 2, 0 ), 295, Vector2( 2, 1 ), 292, Vector2( 2, 2 ), 484, Vector2( 3, 1 ), 256, Vector2( 3, 2 ), 4, Vector2( 4, 1 ), 64, Vector2( 4, 2 ), 1, Vector2( 15, 0 ), 325 ]
-0/autotile/icon_coordinate = Vector2( 0, 0 )
+0/autotile/icon_coordinate = Vector2( 5, 2 )
 0/autotile/tile_size = Vector2( 16, 16 )
 0/autotile/spacing = 0
 0/autotile/occluder_map = [ Vector2( 0, 0 ), SubResource( 1 ), Vector2( 0, 1 ), SubResource( 2 ), Vector2( 0, 2 ), SubResource( 3 ), Vector2( 1, 0 ), SubResource( 4 ), Vector2( 1, 2 ), SubResource( 5 ), Vector2( 2, 0 ), SubResource( 6 ), Vector2( 2, 1 ), SubResource( 7 ), Vector2( 2, 2 ), SubResource( 8 ), Vector2( 3, 1 ), SubResource( 9 ), Vector2( 3, 2 ), SubResource( 10 ), Vector2( 4, 1 ), SubResource( 11 ), Vector2( 4, 2 ), SubResource( 12 ) ]
@@ -500,7 +503,7 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 1/texture = ExtResource( 1 )
 1/tex_offset = Vector2( 0, 0 )
 1/modulate = Color( 1, 1, 1, 1 )
-1/region = Rect2( 0, 320, 48, 80 )
+1/region = Rect2( 32, 288, 16, 16 )
 1/tile_mode = 1
 1/autotile/bitmask_mode = 0
 1/autotile/bitmask_flags = [ Vector2( 0, 0 ), 69, Vector2( 0, 1 ), 65, Vector2( 0, 2 ), 321, Vector2( 0, 3 ), 256, Vector2( 0, 4 ), 4, Vector2( 1, 0 ), 5, Vector2( 1, 1 ), 325, Vector2( 1, 2 ), 320, Vector2( 1, 3 ), 64, Vector2( 1, 4 ), 1, Vector2( 2, 0 ), 261, Vector2( 2, 1 ), 260, Vector2( 2, 2 ), 324, Vector2( 2, 3 ), 325, Vector2( 2, 4 ), 325 ]
@@ -595,7 +598,7 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 2/tile_mode = 1
 2/autotile/bitmask_mode = 0
 2/autotile/bitmask_flags = [ Vector2( 0, 0 ), 69, Vector2( 0, 1 ), 65, Vector2( 0, 2 ), 321, Vector2( 1, 0 ), 5, Vector2( 1, 1 ), 325, Vector2( 1, 2 ), 320, Vector2( 2, 0 ), 261, Vector2( 2, 1 ), 260, Vector2( 2, 2 ), 324, Vector2( 3, 0 ), 256, Vector2( 3, 1 ), 4, Vector2( 4, 0 ), 64, Vector2( 4, 1 ), 1, Vector2( 5, 0 ), 325, Vector2( 5, 1 ), 325 ]
-2/autotile/icon_coordinate = Vector2( 0, 0 )
+2/autotile/icon_coordinate = Vector2( 1, 2 )
 2/autotile/tile_size = Vector2( 16, 16 )
 2/autotile/spacing = 0
 2/autotile/occluder_map = [ Vector2( 0, 0 ), SubResource( 37 ), Vector2( 0, 1 ), SubResource( 38 ), Vector2( 0, 2 ), SubResource( 39 ), Vector2( 1, 0 ), SubResource( 40 ), Vector2( 1, 2 ), SubResource( 41 ), Vector2( 2, 0 ), SubResource( 42 ), Vector2( 2, 1 ), SubResource( 43 ), Vector2( 2, 2 ), SubResource( 44 ), Vector2( 3, 0 ), SubResource( 45 ), Vector2( 3, 1 ), SubResource( 46 ), Vector2( 4, 0 ), SubResource( 47 ), Vector2( 4, 1 ), SubResource( 48 ) ]
@@ -720,7 +723,7 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 5/tile_mode = 1
 5/autotile/bitmask_mode = 0
 5/autotile/bitmask_flags = [ Vector2( 0, 0 ), 69, Vector2( 0, 1 ), 65, Vector2( 0, 2 ), 321, Vector2( 1, 0 ), 5, Vector2( 1, 1 ), 325, Vector2( 1, 2 ), 320, Vector2( 2, 0 ), 261, Vector2( 2, 1 ), 260, Vector2( 2, 2 ), 324, Vector2( 3, 1 ), 256, Vector2( 3, 2 ), 4, Vector2( 4, 1 ), 64, Vector2( 4, 2 ), 1, Vector2( 15, 0 ), 325 ]
-5/autotile/icon_coordinate = Vector2( 0, 0 )
+5/autotile/icon_coordinate = Vector2( 5, 2 )
 5/autotile/tile_size = Vector2( 16, 16 )
 5/autotile/spacing = 0
 5/autotile/occluder_map = [ Vector2( 0, 0 ), SubResource( 64 ), Vector2( 0, 1 ), SubResource( 65 ), Vector2( 0, 2 ), SubResource( 66 ), Vector2( 1, 0 ), SubResource( 67 ), Vector2( 1, 2 ), SubResource( 68 ), Vector2( 2, 0 ), SubResource( 69 ), Vector2( 2, 1 ), SubResource( 70 ), Vector2( 2, 2 ), SubResource( 71 ), Vector2( 3, 1 ), SubResource( 72 ), Vector2( 3, 2 ), SubResource( 73 ), Vector2( 4, 1 ), SubResource( 74 ), Vector2( 4, 2 ), SubResource( 75 ) ]
@@ -811,7 +814,7 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 7/tile_mode = 1
 7/autotile/bitmask_mode = 0
 7/autotile/bitmask_flags = [ Vector2( 0, 0 ), 69, Vector2( 0, 1 ), 65, Vector2( 0, 2 ), 321, Vector2( 1, 0 ), 5, Vector2( 1, 1 ), 325, Vector2( 1, 2 ), 320, Vector2( 2, 0 ), 261, Vector2( 2, 1 ), 260, Vector2( 2, 2 ), 324, Vector2( 3, 1 ), 256, Vector2( 3, 2 ), 4, Vector2( 4, 1 ), 64, Vector2( 4, 2 ), 1, Vector2( 8, 2 ), 325 ]
-7/autotile/icon_coordinate = Vector2( 0, 0 )
+7/autotile/icon_coordinate = Vector2( 7, 0 )
 7/autotile/tile_size = Vector2( 16, 16 )
 7/autotile/spacing = 0
 7/autotile/occluder_map = [ Vector2( 0, 0 ), SubResource( 88 ), Vector2( 0, 1 ), SubResource( 89 ), Vector2( 0, 2 ), SubResource( 90 ), Vector2( 1, 0 ), SubResource( 91 ), Vector2( 1, 2 ), SubResource( 92 ), Vector2( 2, 0 ), SubResource( 93 ), Vector2( 2, 1 ), SubResource( 94 ), Vector2( 2, 2 ), SubResource( 95 ), Vector2( 3, 1 ), SubResource( 96 ), Vector2( 3, 2 ), SubResource( 97 ), Vector2( 4, 1 ), SubResource( 98 ), Vector2( 4, 2 ), SubResource( 99 ) ]
@@ -891,6 +894,12 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 "one_way": false,
 "one_way_margin": 1.0,
 "shape": SubResource( 111 ),
+"shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
+}, {
+"autotile_coord": Vector2( 7, 0 ),
+"one_way": false,
+"one_way_margin": 1.0,
+"shape": SubResource( 135 ),
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 7/z_index = 0
@@ -1110,3 +1119,22 @@ points = PoolVector2Array( 16, 0, 16, 16, 13.0793, 16, 13.0793, 0 )
 13/navigation_offset = Vector2( 0, 0 )
 13/shapes = [  ]
 13/z_index = -1
+14/name = "air"
+14/texture = ExtResource( 1 )
+14/tex_offset = Vector2( 0, 0 )
+14/modulate = Color( 1, 1, 1, 1 )
+14/region = Rect2( 256, 32, 16, 16 )
+14/tile_mode = 1
+14/autotile/bitmask_mode = 0
+14/autotile/bitmask_flags = [  ]
+14/autotile/icon_coordinate = Vector2( 0, 0 )
+14/autotile/tile_size = Vector2( 64, 64 )
+14/autotile/spacing = 0
+14/autotile/occluder_map = [  ]
+14/autotile/navpoly_map = [  ]
+14/autotile/priority_map = [  ]
+14/autotile/z_index_map = [  ]
+14/occluder_offset = Vector2( 0, 0 )
+14/navigation_offset = Vector2( 0, 0 )
+14/shapes = [  ]
+14/z_index = 0

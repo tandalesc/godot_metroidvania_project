@@ -170,7 +170,6 @@ script = ExtResource( 1 )
 texture = ExtResource( 2 )
 vframes = 16
 hframes = 7
-frame = 2
 region_enabled = true
 region_rect = Rect2( 0, 0, 350, 592 )
 
