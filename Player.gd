@@ -6,6 +6,7 @@ const RUNNING_THRESHOLD = 0.5
 const DEFAULT_JUMP_STRENGTH = 250
 const DEFAULT_MAX_SPEED = 120
 const DEFAULT_MAX_JUMPS = 1
+const MAX_WALL_RIDE_SPEED = 150
 
 const UNDERWATER_MAX_SPEED_Y = 40
 const UNDERWATER_MAX_SPEED_X = 45
@@ -20,33 +21,16 @@ var velocity = Vector2()
 
 func _ready():
 	state_machine = $AnimationTree['parameters/playback']
-	for water in get_parent().get_node('World/WaterAreas').get_children():
-		water.connect('body_entered', self, 'potential_water_immersion')
-		water.connect('body_exited', self, 'potential_water_departure')
-	update_properties()
+	
+func enter_water():
+	underwater = true;
+	max_speed = UNDERWATER_MAX_SPEED_X
+	jump_strength = 180
 
-func potential_water_immersion(body):
-	if !underwater and body.name == self.name:
-		underwater = true
-		update_properties()
-
-func potential_water_departure(body):
-	if underwater and body.name == self.name:
-		underwater = false
-		update_properties()
-
-func update_properties():
-	var bubble_emitter = get_node('UnderwaterBubbles')
-	if underwater:
-		max_speed = UNDERWATER_MAX_SPEED_X
-		jump_strength = 180
-		bubble_emitter.emitting = true
-		bubble_emitter.show()
-	else:
-		max_speed = DEFAULT_MAX_SPEED
-		jump_strength = DEFAULT_JUMP_STRENGTH
-		bubble_emitter.emitting = false
-		bubble_emitter.hide()
+func exit_water():
+	underwater = false;
+	max_speed = DEFAULT_MAX_SPEED
+	jump_strength = DEFAULT_JUMP_STRENGTH
 
 func accept_power_up(key):
 	match key:
@@ -63,7 +47,7 @@ func process_inputs(gravity, dampening):
 		$Sprite.flip_h = true
 		velocity.x = max(velocity.x-ACCELERATION, -max_speed)
 	else:
-		velocity.x = lerp(velocity.x, 0, dampening if is_on_floor() else dampening/2)
+		velocity.x = lerp(velocity.x, 0, dampening if is_on_floor() else 2*dampening/3)
 		
 	if Input.is_action_just_pressed('ui_accept'):
 		#allow multiple jumps upto a soft limit
@@ -71,26 +55,32 @@ func process_inputs(gravity, dampening):
 			jumps_taken += 1
 			velocity.y = -jump_strength
 			state_machine.start('jump_start')
+		if state_machine.get_current_node() == 'wall_ride':
+			var facing_left = $Sprite.flip_h
+			velocity.y = 1.1*(-jump_strength)
+			velocity.x = 1.0*(jump_strength if facing_left else -jump_strength)
+			$Sprite.flip_h = !$Sprite.flip_h
+			state_machine.start('jump_start')
 
 func update_animations():
 	var anim_name = state_machine.get_current_node()
-	#handle compound jump animation
-	if anim_name == 'jump_start' and velocity.y>5:
-		state_machine.travel('jump_peak')
-	if anim_name == 'jump_peak' and is_on_floor():
-		#state machine will take us through jump_landing and then to idle
-		state_machine.travel('idle')
-		jumps_taken = 0
 		
-	if anim_name == 'run' or anim_name == 'idle':
-		if is_on_floor():
+	if is_on_floor():
+		if anim_name != 'run' or anim_name != 'idle':
 			state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
-		else:
-			#handle running off the edge of a platform
-			state_machine.start('jump_peak')
-			#allow user one extra jump, not two
-			jumps_taken += 1
-
+		if jumps_taken > 0:
+			jumps_taken = 0
+	elif anim_name == 'jump_start' or anim_name == 'jump_peak':
+		if velocity.y>-0.5 and is_on_wall():
+			state_machine.travel('wall_ride')
+		elif anim_name == 'jump_start' and velocity.y>5:
+			state_machine.travel('jump_peak')	
+	elif anim_name == 'idle' or anim_name == 'run' or (anim_name == 'wall_ride' and !is_on_wall()):
+		#handle running off the edge of a platform
+		state_machine.start('jump_peak')
+		#allow user one extra jump, no more
+		jumps_taken += 1
+		
 func _process(delta):
 	update_animations()
 
@@ -101,6 +91,10 @@ func _physics_process(delta):
 	var dampening = space_state.total_linear_damp
 	velocity += gravity
 	process_inputs(gravity, dampening)
+	#clamp vertical movement speed if clinging to wall
+	if state_machine.get_current_node() == 'wall_ride':
+		var clamped_velocity = clamp(velocity.y, 0.0, MAX_WALL_RIDE_SPEED);
+		velocity.y = lerp(velocity.y, clamped_velocity, 0.3);
 	#dampen all vertical motion in bodies of water
 	if underwater and abs(velocity.y) > UNDERWATER_MAX_SPEED_Y:
 		var clamped_velocity = clamp(velocity.y, -UNDERWATER_MAX_SPEED_Y, UNDERWATER_MAX_SPEED_Y)
