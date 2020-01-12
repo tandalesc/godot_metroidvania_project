@@ -3,6 +3,7 @@ extends KinematicBody2D
 const ACCELERATION = 20
 const RUNNING_THRESHOLD = 0.5
 
+const DEFAULT_PUSHING_FORCE = 25
 const DEFAULT_JUMP_STRENGTH = 250
 const DEFAULT_MAX_SPEED = 120
 const DEFAULT_MAX_JUMPS = 1
@@ -12,6 +13,7 @@ const UNDERWATER_MAX_SPEED_Y = 40
 const UNDERWATER_MAX_SPEED_X = 45
 
 var state_machine
+var pushing_force = DEFAULT_PUSHING_FORCE
 var max_speed = DEFAULT_MAX_SPEED
 var jump_strength = DEFAULT_JUMP_STRENGTH
 var max_jumps = DEFAULT_MAX_JUMPS
@@ -36,6 +38,8 @@ func accept_power_up(key):
 	match key:
 		'double_jump':
 			max_jumps = 2
+		'super_strength':
+			pushing_force = 150
 		_:
 			print('unsure what to do with this power-up')
 
@@ -99,4 +103,10 @@ func _physics_process(delta):
 	if underwater and abs(velocity.y) > UNDERWATER_MAX_SPEED_Y:
 		var clamped_velocity = clamp(velocity.y, -UNDERWATER_MAX_SPEED_Y, UNDERWATER_MAX_SPEED_Y)
 		velocity.y = lerp(velocity.y, clamped_velocity, 0.04)
-	velocity = move_and_slide(velocity, Vector2.UP, 100, 4, PI/4)
+	velocity = move_and_slide(velocity, Vector2.UP, true, 4, PI/3, false)
+	
+	for index in get_slide_count():
+		var collision = get_slide_collision(index)
+		if collision.collider.is_in_group('bodies'):
+			collision.collider.apply_central_impulse(-collision.normal * pushing_force)
+	

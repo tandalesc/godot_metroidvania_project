@@ -1,8 +1,6 @@
 extends Area2D
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+export (String) var power_up_key = 'super_strength'
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,5 +8,5 @@ func _ready():
 
 func body_entered(body):
 	if body.has_method('accept_power_up'):
-		body.accept_power_up('double_jump')
+		body.accept_power_up(power_up_key)
 		queue_free()
