@@ -1,29 +1,37 @@
 extends KinematicBody2D
 
-const ACCELERATION = 20
-const RUNNING_THRESHOLD = 0.5
+const ACCELERATION = 12
+const RUNNING_THRESHOLD = 0.05
 
-const DEFAULT_PUSHING_FORCE = 25
+const DEFAULT_PUSHING_FORCE = 15
 const DEFAULT_JUMP_STRENGTH = 250
 const DEFAULT_MAX_SPEED = 120
-const DEFAULT_MAX_JUMPS = 1
+const DEFAULT_MAX_JUMPS = 2
 const MAX_WALL_RIDE_SPEED = 100
 
 const UNDERWATER_MAX_SPEED_Y = 40
 const UNDERWATER_MAX_SPEED_X = 45
 
-var state_machine
 var pushing_force = DEFAULT_PUSHING_FORCE
 var max_speed = DEFAULT_MAX_SPEED
 var jump_strength = DEFAULT_JUMP_STRENGTH
 var max_jumps = DEFAULT_MAX_JUMPS
+
+enum State {
+	MOVEMENT,
+	ATTACK
+}
+
+var player_state = State.MOVEMENT
+var pause_movement = false
 var jumps_taken = 0
+var attack_timer = 0
 var underwater = false
 var velocity = Vector2()
 
-func _ready():
-	state_machine = $AnimationTree['parameters/playback']
-	
+onready var state_machine = $AnimationTree['parameters/playback']
+onready var body = $Body
+
 func enter_water():
 	underwater = true;
 	max_speed = UNDERWATER_MAX_SPEED_X
@@ -43,52 +51,100 @@ func accept_power_up(key):
 		_:
 			print('unsure what to do with this power-up')
 
+func face_direction(dir):
+	if dir != body.scale.x:
+		body.set_scale(Vector2(dir, 1))
+
 func process_inputs(gravity, dampening):
-	if Input.is_action_pressed('ui_right'):
-		$Sprite.flip_h = false
-		velocity.x = min(velocity.x+ACCELERATION, max_speed)
-	elif Input.is_action_pressed('ui_left'):
-		$Sprite.flip_h = true
-		velocity.x = max(velocity.x-ACCELERATION, -max_speed)
+	var right_pressed = Input.is_action_pressed('ui_right')
+	var left_pressed = Input.is_action_pressed('ui_left')
+	var jump_pressed = Input.is_action_just_pressed('jump')
+	var attack_pressed = Input.is_action_just_pressed('attack')
+	var anim_name = state_machine.get_current_node()
+	
+	var speed_multiplier = max_speed/5 if player_state==State.ATTACK else max_speed
+
+	if right_pressed:
+		face_direction(1)
+		velocity.x = min(velocity.x+ACCELERATION, speed_multiplier)
+	elif left_pressed:
+		face_direction(-1)
+		velocity.x = max(velocity.x-ACCELERATION, -speed_multiplier)
 	else:
 		velocity.x = lerp(velocity.x, 0, dampening if is_on_floor() else 2*dampening/3)
 		
-	if Input.is_action_just_pressed('ui_accept'):
-		#allow multiple jumps upto a soft limit
-		if is_on_floor() or jumps_taken < max_jumps:
+	if jump_pressed:
+		if player_state == State.ATTACK:
+			state_machine.travel('sheath_sword')
+		elif is_on_floor() or jumps_taken < max_jumps:
+			#allow multiple jumps upto a soft limit
 			jumps_taken += 1
 			velocity.y = -jump_strength
 			state_machine.start('jump_start')
-		if state_machine.get_current_node() == 'wall_ride':
-			var facing_left = $Sprite.flip_h
+		if anim_name == 'wall_ride':
+			var facing_left = (body.scale.x==-1)
 			velocity.y = 1.1*(-jump_strength)
 			velocity.x = 1.0*(jump_strength if facing_left else -jump_strength)
-			$Sprite.flip_h = !$Sprite.flip_h
+			face_direction(body.scale.x * -1)
 			state_machine.start('jump_start')
+	
+	if attack_pressed and is_on_floor():
+		attack_timer = OS.get_ticks_msec() + 8000
+		if player_state == State.MOVEMENT and anim_name == 'idle':
+			state_machine.travel('draw_sword')
+		if player_state == State.ATTACK and abs(velocity.x)<30:
+			if anim_name=='attack_2':
+				state_machine.travel('attack_3')
+			elif anim_name=='attack_1':
+				state_machine.travel('attack_2')
+			else:
+				state_machine.travel('attack_1')
 
 func update_animations():
 	var anim_name = state_machine.get_current_node()
-		
 	if is_on_floor():
-		if anim_name != 'run' or anim_name != 'idle':
-			state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
+		if player_state == State.MOVEMENT and anim_name != 'draw_sword':
+				state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
 		if jumps_taken > 0:
 			jumps_taken = 0
 	elif anim_name == 'jump_start' or anim_name == 'jump_peak':
 		if velocity.y>-0.5 and is_on_wall():
 			state_machine.travel('wall_ride')
 		elif anim_name == 'jump_start' and velocity.y>5:
-			state_machine.travel('jump_peak')	
-	elif anim_name == 'idle' or anim_name == 'run' or (anim_name == 'wall_ride' and !is_on_wall()):
-		#handle running off the edge of a platform
-		state_machine.start('jump_peak')
+			state_machine.travel('jump_peak')
+	
+	#handle running off the edge of a platform
+	if !is_on_floor() and (anim_name == 'idle' or anim_name == 'run' or anim_name == 'attack_stance' or (anim_name == 'wall_ride' and !is_on_wall())):
+		if player_state == State.ATTACK:
+			state_machine.travel('sheath_sword')
+		else:
+			state_machine.start('jump_peak')
 		#allow user one extra jump, no more
 		jumps_taken += 1
 		
+	if player_state == State.ATTACK:
+		#end attack stance, go back to idle
+		if attack_timer < OS.get_ticks_msec():
+			state_machine.travel('sheath_sword')
+		
+
+func animation_finished(anim_name):
+	if anim_name == 'attack_1' or anim_name == 'attack_2' or anim_name == 'attack_3':
+		state_machine.travel('attack_stance')
+	elif anim_name == 'sheath_sword':
+		player_state = State.MOVEMENT
+		state_machine.travel('idle')
+	elif anim_name == 'draw_sword':
+		player_state = State.ATTACK
+		state_machine.travel('attack_stance')
+		
+
 func _process(delta):
 	update_animations()
 
 func _physics_process(delta):
+	if pause_movement:
+		return
 	#fetch totaled values for gravity and dampening, inclusive of any area modifications
 	var space_state = Physics2DServer.body_get_direct_state(get_rid())
 	var gravity = space_state.total_gravity
@@ -103,6 +159,8 @@ func _physics_process(delta):
 	if underwater and abs(velocity.y) > UNDERWATER_MAX_SPEED_Y:
 		var clamped_velocity = clamp(velocity.y, -UNDERWATER_MAX_SPEED_Y, UNDERWATER_MAX_SPEED_Y)
 		velocity.y = lerp(velocity.y, clamped_velocity, 0.04)
+	#terminal velocity
+	velocity.y = min(velocity.y, 1000)
 	velocity = move_and_slide(velocity, Vector2.UP, true, 4, PI/3, false)
 	
 	for index in get_slide_count():

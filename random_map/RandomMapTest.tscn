@@ -45,11 +45,14 @@ stages = 4
 editor/display_folded = true
 position = Vector2( 290.506, 244.721 )
 
-[node name="AnimationTree" parent="Player" index="2"]
+[node name="AnimationTree" parent="Player" index="1"]
 parameters/playback = SubResource( 1 )
 
-[node name="Camera2D" parent="Player" index="4"]
+[node name="Camera2D" parent="Player" index="3"]
 zoom = Vector2( 0.5, 0.5 )
+
+[node name="Sprite" parent="Player/Body" index="3"]
+frame = 0
 
 [node name="Light2D" type="Light2D" parent="Player"]
 texture = ExtResource( 5 )
@@ -81,6 +84,7 @@ margin_bottom = 190.0
 script = ExtResource( 8 )
 
 [node name="WorldEdgeDetector-Bottom" type="Area2D" parent="EdgeDetectors"]
+editor/display_folded = true
 position = Vector2( 640, 1230 )
 script = ExtResource( 9 )
 

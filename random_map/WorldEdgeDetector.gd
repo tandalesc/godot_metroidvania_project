@@ -13,7 +13,9 @@ func _ready():
 
 func body_entered(body):
 	if body.name == 'Player':
+		body.pause_movement=true
 		tile_map.extend_if_needed(expand_dir)
+		body.pause_movement=false
 
 func body_exited(body):
 	if body.name == 'Player':

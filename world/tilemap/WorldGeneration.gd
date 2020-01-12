@@ -42,18 +42,21 @@ func extend_if_needed(expand_dir):
 		_generate_region(prospective_chunk)
 		explored_chunks.append(prospective_chunk)
 
+#todo multithread part of this and see if it improves generation latency
+#additionally, increase the size of the chunk region being generated
 func _generate_region(chunk):
 	var start = Vector2(chunk.x, chunk.y)*chunk_size;
 	var end = Vector2((chunk.x+1), (chunk.y+1))*chunk_size;
-	var new_tiles = _initialize_simulation(start, end)
-	new_tiles = _simulate(new_tiles, start, end)
+	var new_tiles = _simulate(start, end)
 	_apply_simulation(new_tiles, start, end)
 
-func _initialize_simulation(start, end):
+#generate using cellular automata
+#inspired by https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
+func _simulate(start, end):
 	var m_w = end.x - start.x;
 	var m_h = end.y - start.y;
-	var sim_tiles = []
 	#create an in-memory representation
+	var sim_tiles = []
 	for y in range(0, m_h):
 		var row = []
 		for x in range(0, m_w):
@@ -62,19 +65,12 @@ func _initialize_simulation(start, end):
 			else:
 				row.append(TILES['air'])
 		sim_tiles.append(row)
-	return sim_tiles
-
-#generate using cellular automata
-#inspired by https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
-func _simulate(sim_tiles, start, end):
-	var m_w = end.x - start.x;
-	var m_h = end.y - start.y;
 	#process repetitions of conway's game of life
 	for r in range(stages):
 		#maintain two copies so we keep our data input clean
 		var sim_tiles_step = sim_tiles.duplicate(true)
-		for x in range(0, m_w):
-			for y in range(0, m_h):
+		for y in range(0, m_h):
+			for x in range(0, m_w):
 				var cell = sim_tiles[y][x]
 				#get list of neighboring ground cells
 				var neighbors = 0.0
@@ -108,7 +104,7 @@ func _apply_simulation(sim_tiles, start, end):
 	var m_w = end.x - start.x;
 	var m_h = end.y - start.y;
 	#apply simulated world to tilemap
-	for x in range(0, m_w):
-		for y in range(0, m_h):
+	for y in range(0, m_h):
+		for x in range(0, m_w):
 			set_cell(x+start.x, y+start.y, sim_tiles[y][x])
 	update_bitmask_region(start, end)
