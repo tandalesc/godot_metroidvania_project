@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://enemy/Enemy.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://world/water/Water.tscn" type="PackedScene" id=5]
 [ext_resource path="res://world/tilemap/platforms.png" type="Texture" id=6]
 [ext_resource path="res://entities/powerups/DoubleJumpPowerup.tscn" type="PackedScene" id=7]
+[ext_resource path="res://inputs/TouchscreenControls.tscn" type="PackedScene" id=8]
 
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.5
@@ -25,6 +26,7 @@ z_index = 1
 [node name="World" type="Node2D" parent="."]
 
 [node name="TileMaps" type="Node2D" parent="World"]
+editor/display_folded = true
 
 [node name="Platforms" type="TileMap" parent="World/TileMaps"]
 z_index = 1
@@ -228,6 +230,7 @@ editor/display_folded = true
 [node name="Entities" type="Node2D" parent="."]
 
 [node name="RigidBodies" type="Node2D" parent="Entities"]
+editor/display_folded = true
 
 [node name="PlatformRigidBody" type="RigidBody2D" parent="Entities/RigidBodies" groups=[
 "bodies",
@@ -271,6 +274,7 @@ visible = false
 shape = SubResource( 2 )
 
 [node name="Powerups" type="Node2D" parent="Entities"]
+editor/display_folded = true
 
 [node name="DoubleJumpPowerup" parent="Entities/Powerups" instance=ExtResource( 7 )]
 
@@ -278,5 +282,7 @@ shape = SubResource( 2 )
 editor/display_folded = true
 position = Vector2( -469.079, -291.363 )
 power_up_key = "super_strength"
+
+[node name="TouchscreenControls" parent="." instance=ExtResource( 8 )]
 
 [editable path="World/WaterAreas/Water1"]

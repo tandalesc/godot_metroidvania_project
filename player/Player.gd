@@ -29,6 +29,7 @@ var attack_timer = 0
 var underwater = false
 var velocity = Vector2()
 
+onready var joystick = $"../TouchscreenControls/JoystickBase/Joystick"
 onready var state_machine = $AnimationTree['parameters/playback']
 onready var body = $Body
 
@@ -56,12 +57,13 @@ func face_direction(dir):
 		body.set_scale(Vector2(dir, 1))
 
 func process_inputs(gravity, dampening):
-	var right_pressed = Input.is_action_pressed('ui_right')
-	var left_pressed = Input.is_action_pressed('ui_left')
+	var joystick_input = joystick.get_value()
+	var right_pressed = Input.is_action_pressed('ui_right') or joystick_input.x > 0
+	var left_pressed = Input.is_action_pressed('ui_left') or joystick_input.x < 0
 	var jump_pressed = Input.is_action_just_pressed('jump')
 	var attack_pressed = Input.is_action_just_pressed('attack')
 	var anim_name = state_machine.get_current_node()
-	
+	#different speed multipliers for each stance the player is in
 	var speed_multiplier = max_speed/5 if player_state==State.ATTACK else max_speed
 
 	if right_pressed:
