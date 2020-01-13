@@ -1,18 +1,18 @@
 [gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://world/water/WaterArea.gd" type="Script" id=1]
-[ext_resource path="res://world/fog.shader" type="Shader" id=2]
+[ext_resource path="res://world/water/water.shader" type="Shader" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 255.75, 109.879 )
 
-[sub_resource type="ShaderMaterial" id=5]
+[sub_resource type="ShaderMaterial" id=2]
 shader = ExtResource( 2 )
-shader_param/color = Color( 0.109804, 0.376471, 0.886275, 0.647059 )
-shader_param/min_opacity = 0.0
+shader_param/tint = Color( 0, 0.705882, 1, 0.458824 )
 shader_param/uv_scale = 6.0
-shader_param/time_scale = 0.1
-shader_param/fbm_octaves = 4
+shader_param/time_scale = 1.0
+shader_param/brightness = 1.5
+shader_param/fbm_octaves = 5
 shader_param/fbm_scale = 0.65
 
 [sub_resource type="Gradient" id=3]
@@ -35,9 +35,9 @@ visible = false
 position = Vector2( 2.25357, 35.4332 )
 shape = SubResource( 1 )
 
-[node name="UnderwaterFog" type="ColorRect" parent="."]
+[node name="UnderwaterEffect" type="ColorRect" parent="."]
 light_mask = 0
-material = SubResource( 5 )
+material = SubResource( 2 )
 margin_left = -253.678
 margin_top = -75.0
 margin_right = 257.322
