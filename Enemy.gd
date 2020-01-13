@@ -45,7 +45,6 @@ func hurt(dmg):
 		die()
 	else:
 		health -= dmg
-		print('enemy is at '+str(health)+' health')
 
 func die():
 	queue_free()

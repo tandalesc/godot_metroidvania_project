@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://player/effects/Sparks.gd" type="Script" id=1]
+
+[sub_resource type="ParticlesMaterial" id=1]
+emission_shape = 2
+emission_box_extents = Vector3( 4, 7, 1 )
+flag_disable_z = true
+spread = 55.0
+gravity = Vector3( 0, 150, 0 )
+initial_velocity = -80.0
+initial_velocity_random = 0.8
+angular_velocity = 1.1042e+21
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+damping = 12.56
+damping_random = 1.0
+angle_random = 0.5
+scale = 2.0
+scale_random = 0.8
+
+[node name="Sparks" type="Particles2D"]
+z_index = 1
+emitting = false
+amount = 7
+one_shot = true
+explosiveness = 0.8
+randomness = 0.3
+local_coords = false
+process_material = SubResource( 1 )
+script = ExtResource( 1 )

@@ -1,12 +1,12 @@
 extends KinematicBody2D
 
 const ACCELERATION = 12
-const RUNNING_THRESHOLD = 0.05
+const RUNNING_THRESHOLD = 0.5
 
-const DEFAULT_PUSHING_FORCE = 15
+const DEFAULT_PUSHING_FORCE = 0
 const DEFAULT_JUMP_STRENGTH = 250
 const DEFAULT_MAX_SPEED = 120
-const DEFAULT_MAX_JUMPS = 2
+const DEFAULT_MAX_JUMPS = 1
 const MAX_WALL_RIDE_SPEED = 100
 
 const UNDERWATER_MAX_SPEED_Y = 40
@@ -90,9 +90,9 @@ func process_inputs(gravity, dampening):
 	
 	if attack_pressed and is_on_floor():
 		attack_timer = OS.get_ticks_msec() + 8000
-		if player_state == State.MOVEMENT and anim_name == 'idle':
+		if player_state == State.MOVEMENT and abs(velocity.x)<max_speed*0.8:
 			state_machine.travel('draw_sword')
-		if player_state == State.ATTACK and abs(velocity.x)<30:
+		elif player_state == State.ATTACK and abs(velocity.x)<30:
 			if anim_name=='attack_2':
 				state_machine.travel('attack_3')
 			elif anim_name=='attack_1':
@@ -101,10 +101,16 @@ func process_inputs(gravity, dampening):
 				state_machine.travel('attack_1')
 
 func update_animations():
+	var right_pressed = Input.is_action_pressed('ui_right')
+	var left_pressed = Input.is_action_pressed('ui_left')
+	
 	var anim_name = state_machine.get_current_node()
 	if is_on_floor():
 		if player_state == State.MOVEMENT and anim_name != 'draw_sword':
-				state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
+			if abs(velocity.x)<RUNNING_THRESHOLD and !right_pressed and !left_pressed:
+				state_machine.travel('idle')
+			else:
+				state_machine.travel('run')
 		if jumps_taken > 0:
 			jumps_taken = 0
 	elif anim_name == 'jump_start' or anim_name == 'jump_peak':
@@ -161,8 +167,12 @@ func _physics_process(delta):
 		velocity.y = lerp(velocity.y, clamped_velocity, 0.04)
 	#terminal velocity
 	velocity.y = min(velocity.y, 1000)
-	velocity = move_and_slide(velocity, Vector2.UP, true, 4, PI/3, false)
 	
+	#required for kinematicbody physics
+	#parameters: ground normal, stop on slope, max bounces, max slope angle, infinite intertia
+	velocity = move_and_slide(velocity, Vector2.UP, true, 4, PI/4, false)
+	
+	#apply pushing force to rigid bodies
 	for index in get_slide_count():
 		var collision = get_slide_collision(index)
 		if collision.collider.is_in_group('bodies'):

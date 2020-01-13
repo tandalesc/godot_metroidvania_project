@@ -1,10 +1,11 @@
-[gd_scene load_steps=56 format=2]
+[gd_scene load_steps=57 format=2]
 
 [ext_resource path="res://player/Player.gd" type="Script" id=1]
 [ext_resource path="res://player/HurtBox.gd" type="Script" id=2]
 [ext_resource path="res://player/sprites/adventurer-v1.5-Sheet.png" type="Texture" id=3]
+[ext_resource path="res://player/effects/Sparks.tscn" type="PackedScene" id=4]
 
-[sub_resource type="Animation" id=30]
+[sub_resource type="Animation" id=53]
 resource_name = "attack_1"
 length = 0.6
 tracks/0/type = "value"
@@ -47,20 +48,8 @@ tracks/2/keys = {
 "method": "do_damage"
 } ]
 }
-tracks/3/type = "value"
-tracks/3/path = NodePath("Body/Attack1_HurtBox:monitoring")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0, 0.6 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ true, false ]
-}
 
-[sub_resource type="Animation" id=34]
+[sub_resource type="Animation" id=54]
 resource_name = "attack_2"
 length = 0.4
 tracks/0/type = "value"
@@ -89,25 +78,13 @@ tracks/1/keys = {
 "method": "animation_finished"
 } ]
 }
-tracks/2/type = "value"
-tracks/2/path = NodePath("Body/Attack2_HurtBox:monitoring")
+tracks/2/type = "method"
+tracks/2/path = NodePath("Body/Attack2_HurtBox")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.4 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ true, false ]
-}
-tracks/3/type = "method"
-tracks/3/path = NodePath("Body/Attack2_HurtBox")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
 "times": PoolRealArray( 0.2 ),
 "transitions": PoolRealArray( 1 ),
 "values": [ {
@@ -116,7 +93,7 @@ tracks/3/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=45]
+[sub_resource type="Animation" id=55]
 resource_name = "attack_3"
 length = 0.5
 tracks/0/type = "value"
@@ -145,25 +122,13 @@ tracks/1/keys = {
 "method": "animation_finished"
 } ]
 }
-tracks/2/type = "value"
-tracks/2/path = NodePath("Body/Attack3_HurtBox:monitoring")
+tracks/2/type = "method"
+tracks/2/path = NodePath("Body/Attack3_HurtBox")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.5 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 0,
-"values": [ true, false ]
-}
-tracks/3/type = "method"
-tracks/3/path = NodePath("Body/Attack3_HurtBox")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
 "times": PoolRealArray( 0.2 ),
 "transitions": PoolRealArray( 1 ),
 "values": [ {
@@ -172,7 +137,7 @@ tracks/3/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=29]
+[sub_resource type="Animation" id=56]
 resource_name = "attack_stance"
 length = 0.4
 loop = true
@@ -189,7 +154,7 @@ tracks/0/keys = {
 "values": [ 38, 41 ]
 }
 
-[sub_resource type="Animation" id=67]
+[sub_resource type="Animation" id=57]
 resource_name = "draw_sword"
 length = 0.4
 tracks/0/type = "value"
@@ -219,8 +184,7 @@ tracks/1/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=1]
-resource_name = "idle"
+[sub_resource type="Animation" id=58]
 length = 0.4
 loop = true
 tracks/0/type = "value"
@@ -236,7 +200,7 @@ tracks/0/keys = {
 "values": [ 0, 3 ]
 }
 
-[sub_resource type="Animation" id=2]
+[sub_resource type="Animation" id=59]
 length = 0.1
 tracks/0/type = "value"
 tracks/0/path = NodePath("Body/Sprite:frame")
@@ -251,7 +215,7 @@ tracks/0/keys = {
 "values": [ 15, 14 ]
 }
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=60]
 length = 0.1
 tracks/0/type = "value"
 tracks/0/path = NodePath("Body/Sprite:frame")
@@ -266,8 +230,7 @@ tracks/0/keys = {
 "values": [ 17, 22 ]
 }
 
-[sub_resource type="Animation" id=4]
-resource_name = "jump_start"
+[sub_resource type="Animation" id=61]
 length = 0.1
 tracks/0/type = "value"
 tracks/0/path = NodePath("Body/Sprite:frame")
@@ -282,7 +245,7 @@ tracks/0/keys = {
 "values": [ 15, 16 ]
 }
 
-[sub_resource type="Animation" id=5]
+[sub_resource type="Animation" id=62]
 length = 0.6
 loop = true
 tracks/0/type = "value"
@@ -298,7 +261,7 @@ tracks/0/keys = {
 "values": [ 8, 13 ]
 }
 
-[sub_resource type="Animation" id=68]
+[sub_resource type="Animation" id=63]
 resource_name = "sheath_sword"
 length = 0.4
 tracks/0/type = "value"
@@ -328,8 +291,7 @@ tracks/1/keys = {
 } ]
 }
 
-[sub_resource type="Animation" id=6]
-resource_name = "wall_ride"
+[sub_resource type="Animation" id=64]
 length = 0.1
 loop = true
 tracks/0/type = "value"
@@ -345,181 +307,168 @@ tracks/0/keys = {
 "values": [ 79, 80 ]
 }
 
-[sub_resource type="AnimationNodeAnimation" id=56]
+[sub_resource type="AnimationNodeAnimation" id=13]
 animation = "attack_1"
 
-[sub_resource type="AnimationNodeAnimation" id=57]
+[sub_resource type="AnimationNodeAnimation" id=14]
 animation = "attack_2"
 
-[sub_resource type="AnimationNodeAnimation" id=58]
+[sub_resource type="AnimationNodeAnimation" id=15]
 animation = "attack_3"
 
-[sub_resource type="AnimationNodeAnimation" id=37]
+[sub_resource type="AnimationNodeAnimation" id=16]
 animation = "attack_stance"
 
-[sub_resource type="AnimationNodeAnimation" id=69]
+[sub_resource type="AnimationNodeAnimation" id=17]
 animation = "draw_sword"
 
-[sub_resource type="AnimationNodeAnimation" id=7]
+[sub_resource type="AnimationNodeAnimation" id=18]
 animation = "idle"
 
-[sub_resource type="AnimationNodeAnimation" id=8]
+[sub_resource type="AnimationNodeAnimation" id=19]
 animation = "jump_landing"
 
-[sub_resource type="AnimationNodeAnimation" id=9]
+[sub_resource type="AnimationNodeAnimation" id=20]
 animation = "jump_peak"
 
-[sub_resource type="AnimationNodeAnimation" id=10]
+[sub_resource type="AnimationNodeAnimation" id=21]
 animation = "jump_start"
 
-[sub_resource type="AnimationNodeAnimation" id=11]
+[sub_resource type="AnimationNodeAnimation" id=22]
 animation = "run"
 
-[sub_resource type="AnimationNodeAnimation" id=70]
+[sub_resource type="AnimationNodeAnimation" id=23]
 animation = "sheath_sword"
 
-[sub_resource type="AnimationNodeAnimation" id=12]
+[sub_resource type="AnimationNodeAnimation" id=24]
 animation = "wall_ride"
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=50]
+[sub_resource type="AnimationNodeStateMachineTransition" id=25]
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=51]
-switch_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=15]
-switch_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=52]
-switch_mode = 2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=17]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=18]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=19]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=20]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=53]
+[sub_resource type="AnimationNodeStateMachineTransition" id=26]
 switch_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=27]
+switch_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=28]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=59]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=60]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=61]
+[sub_resource type="AnimationNodeStateMachineTransition" id=29]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=30]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=31]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=33]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=62]
+[sub_resource type="AnimationNodeStateMachineTransition" id=34]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=35]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=36]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=37]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=63]
+[sub_resource type="AnimationNodeStateMachineTransition" id=38]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=64]
+[sub_resource type="AnimationNodeStateMachineTransition" id=39]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=71]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=72]
+[sub_resource type="AnimationNodeStateMachineTransition" id=40]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=73]
+[sub_resource type="AnimationNodeStateMachineTransition" id=41]
 switch_mode = 2
 
-[sub_resource type="AnimationNodeStateMachineTransition" id=74]
+[sub_resource type="AnimationNodeStateMachineTransition" id=42]
 
-[sub_resource type="AnimationNodeStateMachine" id=54]
-states/attack_1/node = SubResource( 56 )
+[sub_resource type="AnimationNodeStateMachineTransition" id=43]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=44]
+switch_mode = 2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=45]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=52]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=65]
+
+[sub_resource type="AnimationNodeStateMachine" id=46]
+states/attack_1/node = SubResource( 13 )
 states/attack_1/position = Vector2( 691.5, 53.9057 )
-states/attack_2/node = SubResource( 57 )
+states/attack_2/node = SubResource( 14 )
 states/attack_2/position = Vector2( 788, 138.716 )
-states/attack_3/node = SubResource( 58 )
+states/attack_3/node = SubResource( 15 )
 states/attack_3/position = Vector2( 693.875, 221.942 )
-states/attack_stance/node = SubResource( 37 )
+states/attack_stance/node = SubResource( 16 )
 states/attack_stance/position = Vector2( 612.5, 136.856 )
-states/draw_sword/node = SubResource( 69 )
-states/draw_sword/position = Vector2( 389.451, -16.8108 )
-states/idle/node = SubResource( 7 )
+states/draw_sword/node = SubResource( 17 )
+states/draw_sword/position = Vector2( 407.487, 36.1892 )
+states/idle/node = SubResource( 18 )
 states/idle/position = Vector2( 83.75, 53.4726 )
-states/jump_landing/node = SubResource( 8 )
+states/jump_landing/node = SubResource( 19 )
 states/jump_landing/position = Vector2( 90.5, 222.319 )
-states/jump_peak/node = SubResource( 9 )
+states/jump_peak/node = SubResource( 20 )
 states/jump_peak/position = Vector2( 83.375, 297.197 )
-states/jump_start/node = SubResource( 10 )
+states/jump_start/node = SubResource( 21 )
 states/jump_start/position = Vector2( 275.5, 261.697 )
-states/run/node = SubResource( 11 )
-states/run/position = Vector2( 277.625, 137.786 )
-states/sheath_sword/node = SubResource( 70 )
-states/sheath_sword/position = Vector2( 389.524, 39.3741 )
-states/wall_ride/node = SubResource( 12 )
+states/run/node = SubResource( 22 )
+states/run/position = Vector2( 281.625, 137.786 )
+states/sheath_sword/node = SubResource( 23 )
+states/sheath_sword/position = Vector2( 406.524, -21.1259 )
+states/wall_ride/node = SubResource( 24 )
 states/wall_ride/position = Vector2( 275.562, 380.31 )
-transitions = [ "run", "jump_start", SubResource( 50 ), "jump_start", "jump_peak", SubResource( 51 ), "jump_peak", "jump_landing", SubResource( 15 ), "jump_landing", "idle", SubResource( 52 ), "jump_start", "wall_ride", SubResource( 17 ), "jump_peak", "wall_ride", SubResource( 18 ), "wall_ride", "jump_start", SubResource( 19 ), "run", "idle", SubResource( 20 ), "jump_landing", "run", SubResource( 53 ), "idle", "run", SubResource( 27 ), "idle", "jump_start", SubResource( 28 ), "attack_stance", "attack_1", SubResource( 59 ), "attack_1", "attack_stance", SubResource( 60 ), "attack_1", "attack_2", SubResource( 61 ), "attack_2", "attack_3", SubResource( 62 ), "attack_3", "attack_stance", SubResource( 63 ), "attack_2", "attack_stance", SubResource( 64 ), "idle", "draw_sword", SubResource( 71 ), "draw_sword", "attack_stance", SubResource( 72 ), "sheath_sword", "idle", SubResource( 73 ), "attack_stance", "sheath_sword", SubResource( 74 ) ]
+transitions = [ "run", "jump_start", SubResource( 25 ), "jump_start", "jump_peak", SubResource( 26 ), "jump_peak", "jump_landing", SubResource( 27 ), "jump_landing", "idle", SubResource( 28 ), "jump_start", "wall_ride", SubResource( 29 ), "jump_peak", "wall_ride", SubResource( 30 ), "wall_ride", "jump_start", SubResource( 31 ), "jump_landing", "run", SubResource( 33 ), "idle", "run", SubResource( 34 ), "idle", "jump_start", SubResource( 35 ), "attack_stance", "attack_1", SubResource( 36 ), "attack_1", "attack_stance", SubResource( 37 ), "attack_1", "attack_2", SubResource( 38 ), "attack_2", "attack_3", SubResource( 39 ), "attack_3", "attack_stance", SubResource( 40 ), "attack_2", "attack_stance", SubResource( 41 ), "idle", "draw_sword", SubResource( 42 ), "draw_sword", "attack_stance", SubResource( 43 ), "sheath_sword", "idle", SubResource( 44 ), "attack_stance", "sheath_sword", SubResource( 45 ), "run", "idle", SubResource( 52 ), "run", "draw_sword", SubResource( 65 ) ]
 start_node = "idle"
-graph_offset = Vector2( 0, -100.329 )
+graph_offset = Vector2( 0, -53.9098 )
 
-[sub_resource type="AnimationNodeStateMachinePlayback" id=55]
+[sub_resource type="AnimationNodeStateMachinePlayback" id=47]
 
-[sub_resource type="RectangleShape2D" id=26]
+[sub_resource type="RectangleShape2D" id=48]
 extents = Vector2( 7.10197, 14.8997 )
 
-[sub_resource type="RectangleShape2D" id=44]
+[sub_resource type="RectangleShape2D" id=49]
 extents = Vector2( 14.1909, 16.8427 )
 
-[sub_resource type="RectangleShape2D" id=65]
+[sub_resource type="RectangleShape2D" id=50]
 extents = Vector2( 17.7951, 15.1961 )
 
-[sub_resource type="RectangleShape2D" id=66]
+[sub_resource type="RectangleShape2D" id=51]
 extents = Vector2( 24.6143, 11.2042 )
-
-[sub_resource type="ParticlesMaterial" id=75]
-emission_shape = 2
-emission_box_extents = Vector3( 5, 8, 1 )
-flag_disable_z = true
-spread = 80.0
-gravity = Vector3( 0, 200, 0 )
-initial_velocity = -50.0
-initial_velocity_random = 0.5
-angular_velocity = 1.1042e+21
-orbit_velocity = 0.0
-orbit_velocity_random = 0.0
-angle_random = 0.5
-scale = 2.0
-scale_random = 0.5
 
 [node name="Player" type="KinematicBody2D"]
 position = Vector2( 23.0792, -2.39501 )
 script = ExtResource( 1 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/attack_1 = SubResource( 30 )
-anims/attack_2 = SubResource( 34 )
-anims/attack_3 = SubResource( 45 )
-anims/attack_stance = SubResource( 29 )
-anims/draw_sword = SubResource( 67 )
-anims/idle = SubResource( 1 )
-anims/jump_landing = SubResource( 2 )
-anims/jump_peak = SubResource( 3 )
-anims/jump_start = SubResource( 4 )
-anims/run = SubResource( 5 )
-anims/sheath_sword = SubResource( 68 )
-anims/wall_ride = SubResource( 6 )
+anims/attack_1 = SubResource( 53 )
+anims/attack_2 = SubResource( 54 )
+anims/attack_3 = SubResource( 55 )
+anims/attack_stance = SubResource( 56 )
+anims/draw_sword = SubResource( 57 )
+anims/idle = SubResource( 58 )
+anims/jump_landing = SubResource( 59 )
+anims/jump_peak = SubResource( 60 )
+anims/jump_start = SubResource( 61 )
+anims/run = SubResource( 62 )
+anims/sheath_sword = SubResource( 63 )
+anims/wall_ride = SubResource( 64 )
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
-tree_root = SubResource( 54 )
+tree_root = SubResource( 46 )
 anim_player = NodePath("../AnimationPlayer")
 active = true
-parameters/playback = SubResource( 55 )
+parameters/playback = SubResource( 47 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 position = Vector2( -0.143909, 1.95186 )
-shape = SubResource( 26 )
+shape = SubResource( 48 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -535,54 +484,43 @@ drag_margin_bottom = 0.15
 
 [node name="Attack1_HurtBox" type="Area2D" parent="Body"]
 editor/display_folded = true
-visible = false
-monitoring = false
 script = ExtResource( 2 )
+attack_strength = 10.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack1_HurtBox"]
 position = Vector2( 10.5831, -3.08632 )
-shape = SubResource( 44 )
+shape = SubResource( 49 )
 
 [node name="Attack2_HurtBox" type="Area2D" parent="Body"]
 editor/display_folded = true
-visible = false
-monitoring = false
 script = ExtResource( 2 )
-attack_strength = 400.0
+attack_strength = 20.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack2_HurtBox"]
 position = Vector2( 4.90717, 2.60423 )
-shape = SubResource( 65 )
+shape = SubResource( 50 )
 
 [node name="Attack3_HurtBox" type="Area2D" parent="Body"]
 editor/display_folded = true
-visible = false
 priority = 2.0
-monitoring = false
 script = ExtResource( 2 )
-attack_strength = 500.0
+attack_strength = 30.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack3_HurtBox"]
 position = Vector2( 0.850159, 4.65472 )
-shape = SubResource( 66 )
+shape = SubResource( 51 )
 
 [node name="Sprite" type="Sprite" parent="Body"]
 texture = ExtResource( 3 )
 vframes = 16
 hframes = 7
-frame = 1
 region_enabled = true
 region_rect = Rect2( 0, 0, 350, 592 )
 
 [node name="Effects" type="Node2D" parent="Body"]
 z_index = 1
 
-[node name="Sparks" type="Particles2D" parent="Body/Effects"]
-position = Vector2( 9.37965, 2.09238 )
-emitting = false
-amount = 6
-lifetime = 0.5
-one_shot = true
-explosiveness = 0.8
-local_coords = false
-process_material = SubResource( 75 )
+[node name="Sparks" parent="Body/Effects" instance=ExtResource( 4 )]
+position = Vector2( 16.3783, 2.66959 )
+randomness = 0.4
+fract_delta = false

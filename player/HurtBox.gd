@@ -4,7 +4,7 @@ export (float, 1, 1000) var attack_strength = 300
 
 onready var player = $"../.."
 onready var collision_shape = $CollisionShape2D
-onready var sparks = $"../Effects/Sparks"
+onready var sparks_node = preload("res://player/effects/Sparks.tscn")
 
 var attack = false
 	
@@ -13,8 +13,9 @@ func do_damage():
 		attack = true
 
 func _physics_process(delta):
-	if attack and len(get_overlapping_bodies())>0:
-		for body in get_overlapping_bodies():
+	var bodies = get_overlapping_bodies()
+	if attack and len(bodies)>0:
+		for body in bodies:
 			if body.name == 'Enemy':
 				hurt_enemy(body)
 			elif body.is_in_group('bodies'):
@@ -22,13 +23,15 @@ func _physics_process(delta):
 			#generate sparks
 			if body.name == 'Platforms' or body.is_in_group('bodies'):
 				#todo improve positioning and responsiveness
+				var sparks = sparks_node.instance()
+				sparks.one_shot = true
 				sparks.emitting = true
-				sparks.restart()
+				add_child(sparks)
 		attack = false
 
 func hurt_rigid_body(body):
-	body.apply_central_impulse((body.global_position-player.global_position).normalized() * attack_strength * 10)
+	body.apply_central_impulse((body.global_position-player.global_position).normalized() * player.pushing_force * attack_strength)
 
 func hurt_enemy(body):
-	body.impulse += (body.global_position-player.global_position).normalized().rotated(randf()) * attack_strength
-	body.hurt(10)
+	body.impulse += (body.global_position-player.global_position).normalized().rotated(randf()) * 50 * attack_strength
+	body.hurt(attack_strength)
