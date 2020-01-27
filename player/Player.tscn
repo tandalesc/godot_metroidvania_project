@@ -408,29 +408,30 @@ states/attack_3/position = Vector2( 693.875, 221.942 )
 states/attack_stance/node = SubResource( 16 )
 states/attack_stance/position = Vector2( 612.5, 136.856 )
 states/draw_sword/node = SubResource( 17 )
-states/draw_sword/position = Vector2( 407.487, 36.1892 )
+states/draw_sword/position = Vector2( 407.01, 52.5475 )
 states/idle/node = SubResource( 18 )
-states/idle/position = Vector2( 83.75, 53.4726 )
+states/idle/position = Vector2( 183.406, 53.2266 )
 states/jump_landing/node = SubResource( 19 )
-states/jump_landing/position = Vector2( 90.5, 222.319 )
+states/jump_landing/position = Vector2( 346.199, 273.741 )
 states/jump_peak/node = SubResource( 20 )
-states/jump_peak/position = Vector2( 83.375, 297.197 )
+states/jump_peak/position = Vector2( 112.414, 266.952 )
 states/jump_start/node = SubResource( 21 )
-states/jump_start/position = Vector2( 275.5, 261.697 )
+states/jump_start/position = Vector2( 111.578, 130.839 )
 states/run/node = SubResource( 22 )
-states/run/position = Vector2( 281.625, 137.786 )
+states/run/position = Vector2( 347.125, 138.479 )
 states/sheath_sword/node = SubResource( 23 )
-states/sheath_sword/position = Vector2( 406.524, -21.1259 )
+states/sheath_sword/position = Vector2( 408.515, -4.1259 )
 states/wall_ride/node = SubResource( 24 )
-states/wall_ride/position = Vector2( 275.562, 380.31 )
+states/wall_ride/position = Vector2( 194.734, 205.31 )
 transitions = [ "run", "jump_start", SubResource( 25 ), "jump_start", "jump_peak", SubResource( 26 ), "jump_peak", "jump_landing", SubResource( 27 ), "jump_landing", "idle", SubResource( 28 ), "jump_start", "wall_ride", SubResource( 29 ), "jump_peak", "wall_ride", SubResource( 30 ), "wall_ride", "jump_start", SubResource( 31 ), "jump_landing", "run", SubResource( 32 ), "idle", "run", SubResource( 33 ), "idle", "jump_start", SubResource( 34 ), "attack_stance", "attack_1", SubResource( 35 ), "attack_1", "attack_stance", SubResource( 36 ), "attack_1", "attack_2", SubResource( 37 ), "attack_2", "attack_3", SubResource( 38 ), "attack_3", "attack_stance", SubResource( 39 ), "attack_2", "attack_stance", SubResource( 40 ), "idle", "draw_sword", SubResource( 41 ), "draw_sword", "attack_stance", SubResource( 42 ), "sheath_sword", "idle", SubResource( 43 ), "attack_stance", "sheath_sword", SubResource( 44 ), "run", "idle", SubResource( 45 ), "run", "draw_sword", SubResource( 46 ) ]
 start_node = "idle"
-graph_offset = Vector2( 0, -53.9098 )
+graph_offset = Vector2( 0, -67.5965 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=48]
 
-[sub_resource type="RectangleShape2D" id=49]
-extents = Vector2( 7.10197, 14.8997 )
+[sub_resource type="CapsuleShape2D" id=53]
+radius = 7.7671
+height = 14.358
 
 [sub_resource type="RectangleShape2D" id=50]
 extents = Vector2( 14.1909, 16.8427 )
@@ -468,7 +469,7 @@ parameters/playback = SubResource( 48 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 position = Vector2( -0.143909, 1.95186 )
-shape = SubResource( 49 )
+shape = SubResource( 53 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
@@ -488,6 +489,7 @@ script = ExtResource( 2 )
 attack_strength = 10.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack1_HurtBox"]
+visible = false
 position = Vector2( 10.5831, -3.08632 )
 shape = SubResource( 50 )
 
@@ -497,16 +499,17 @@ script = ExtResource( 2 )
 attack_strength = 20.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack2_HurtBox"]
+visible = false
 position = Vector2( 4.90717, 2.60423 )
 shape = SubResource( 51 )
 
 [node name="Attack3_HurtBox" type="Area2D" parent="Body"]
-editor/display_folded = true
 priority = 2.0
 script = ExtResource( 2 )
 attack_strength = 30.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body/Attack3_HurtBox"]
+visible = false
 position = Vector2( 0.850159, 4.65472 )
 shape = SubResource( 52 )
 
@@ -514,7 +517,6 @@ shape = SubResource( 52 )
 texture = ExtResource( 3 )
 vframes = 16
 hframes = 7
-frame = 1
 region_enabled = true
 region_rect = Rect2( 0, 0, 350, 592 )
 

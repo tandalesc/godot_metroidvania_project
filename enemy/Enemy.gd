@@ -5,7 +5,7 @@ const RUNNING_THRESHOLD = 0.5
 
 const MAX_HEALTH = 100
 const DEFAULT_PUSHING_FORCE = 25
-const DEFAULT_JUMP_STRENGTH = 250
+const DEFAULT_JUMP_STRENGTH = 220
 const DEFAULT_MAX_SPEED = 120
 const DEFAULT_MAX_JUMPS = 1
 const MAX_WALL_RIDE_SPEED = 100
@@ -25,6 +25,8 @@ var jump_strength = DEFAULT_JUMP_STRENGTH
 var max_jumps = DEFAULT_MAX_JUMPS
 
 var health = MAX_HEALTH
+var dist_to_player = -1
+var attack_timeout = 0
 var player_detected_and_visible = false
 var underwater = false
 var velocity = Vector2()
@@ -59,12 +61,13 @@ func accept_power_up(key):
 			print('unsure what to do with this power-up')
 
 func process_inputs(gravity, dampening):
-	if player_detected_and_visible and player.global_position.x-global_position.x > 30:
+	dist_to_player = player.global_position-global_position
+	if player_detected_and_visible and dist_to_player.x > 30:
 		if body.scale.x == 1:
 			body.set_scale(Vector2(-1,1))
 			body.translate(Vector2(12,0))
 		velocity.x = min(velocity.x+ACCELERATION, max_speed)
-	elif player_detected_and_visible and player.global_position.x-global_position.x < -30:
+	elif player_detected_and_visible and dist_to_player.x < -30:
 		if body.scale.x == -1:
 			body.set_scale(Vector2(1,1))
 			body.translate(Vector2(-12,0))
@@ -72,18 +75,29 @@ func process_inputs(gravity, dampening):
 	else:
 		velocity.x = lerp(velocity.x, 0, dampening if is_on_floor() else 2*dampening/3)
 	
-	if player_detected_and_visible and player.global_position.y-global_position.y < -50 and is_on_floor():
+	if player_detected_and_visible and dist_to_player.y < -50 and is_on_floor():
 		velocity.y = -jump_strength
 
-func update_animations():
+func update_state():
 	var anim_name = state_machine.get_current_node()
-		
+	var is_attacking = anim_name=='attack_1'
 	if is_on_floor():
-		if anim_name != 'run' or anim_name != 'idle':
-			state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
-		
+		if !is_attacking:
+			#should I attack?
+			if dist_to_player.length() < 30 and attack_timeout<=0:
+				state_machine.travel('attack_1')
+				attack_timeout = 1
+			else:
+				state_machine.travel('run' if abs(velocity.x)>RUNNING_THRESHOLD else 'idle')
+
+func animation_finished(anim_name):
+	if anim_name=='attack_1':
+		state_machine.travel('idle')
+
 func _process(delta):
-	update_animations()
+	update_state()
+	if attack_timeout>0:
+		attack_timeout-=delta
 
 func _physics_process(delta):
 	#fetch totaled values for gravity and dampening, inclusive of any area modifications

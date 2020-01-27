@@ -18,45 +18,55 @@ const neighbor_tile_weight = 1.3;
 const diag_tile_weight = 1.1;
 
 onready var random_map = $".."
+onready var chunk_size = random_map.chunk_size
 
-var explored_chunks = []
-const chunk_size = 80
+var explored_chunks = {}
+var generated_chunks = {}
 const tile_width = 16
 const tile_height = 16
-const map_width = chunk_size
-const map_height = chunk_size
+var map_width = chunk_size
+var map_height = chunk_size
 
 func _ready():
 	TILES['ground'] = tile_set.find_tile_by_name(ground_cell)
 	#TILES['air'] = -1;#tile_set.find_tile_by_name(air_cell)
 	TILES['detail'] = tile_set.find_tile_by_name('region3_stalactite')
 	
+	randomize()
 	clear()
-	var player_chunk = random_map.get_player_chunk()
-	_generate_region(player_chunk)
-	explored_chunks.append(player_chunk)
+	#loads current position and all neighboring positions
+	extend_if_needed(Vector2.ZERO, true)
 
-func extend_if_needed(expand_dir):
+func extend_if_needed(expand_dir, recursive=true):
 	var prospective_chunk = random_map.get_player_chunk() + expand_dir
 	if !explored_chunks.has(prospective_chunk):
-		_generate_region(prospective_chunk)
-		explored_chunks.append(prospective_chunk)
+		if !generated_chunks.has(prospective_chunk):
+			_generate_region(prospective_chunk)
+		explored_chunks[prospective_chunk] = true
+	if recursive:
+		#check neighboring tiles
+		for dy in range(-1,2):
+			for dx in range(-1,2):
+				var neighbor_chunk = prospective_chunk + Vector2(dx, dy)
+				if !generated_chunks.has(neighbor_chunk):
+					_generate_region(neighbor_chunk)
 
-#todo multithread part of this and see if it improves generation latency
-#additionally, increase the size of the chunk region being generated
 func _generate_region(chunk):
-	var start = Vector2(chunk.x, chunk.y)*chunk_size;
-	var end = Vector2((chunk.x+1), (chunk.y+1))*chunk_size;
+	#stagger chunks every other row to break up inevitable grid
+	var start = Vector2(chunk.x if int(chunk.y)%2==0 else chunk.x-0.5, chunk.y)*chunk_size;
+	var end = Vector2(((chunk.x if int(chunk.y)%2==0 else chunk.x-0.5)+1), (chunk.y+1))*chunk_size;
 	var new_tiles = _simulate(start, end)
 	_apply_simulation(new_tiles, start, end)
+	if !generated_chunks.has(chunk):
+		generated_chunks[chunk] = true
 
 #generate using cellular automata
 #inspired by https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
 func _simulate(start, end):
-	var m_w = end.x - start.x;
-	var m_h = end.y - start.y;
-	#create an in-memory representation
-	var sim_tiles = []
+	var m_w = end.x - start.x
+	var m_h = end.y - start.y
+	var tile_buffer = [[], []]
+	#fill in buffer 0
 	for y in range(0, m_h):
 		var row = []
 		for x in range(0, m_w):
@@ -64,41 +74,42 @@ func _simulate(start, end):
 				row.append(TILES['ground'])
 			else:
 				row.append(TILES['air'])
-		sim_tiles.append(row)
+		tile_buffer[0].append(row)
+	var selected_buffer = 0
 	#process repetitions of conway's game of life
 	for r in range(stages):
 		#maintain two copies so we keep our data input clean
-		var sim_tiles_step = sim_tiles.duplicate(true)
+		tile_buffer[(r+1)%2] = tile_buffer[r%2].duplicate(true)
 		for y in range(0, m_h):
 			for x in range(0, m_w):
-				var cell = sim_tiles[y][x]
+				var cell = tile_buffer[r%2][y][x]
 				#get list of neighboring ground cells
 				var neighbors = 0.0
-				for dx in range(-1, 2):
-					for dy in range(-1, 2):
+				for dy in range(-1, 2):
+					for dx in range(-1, 2):
 						#(x+dx, y+dy) is within our array size constraints
 						var is_valid_pos = (y+dy>0 and m_h>y+dy and x+dx>0 and m_w>x+dx)
 						if (dx != 0 or dy != 0) and is_valid_pos: #ignore center
-							var neighbor_cell = sim_tiles[y+dy][x+dx]
+							var neighbor_cell = tile_buffer[r%2][y+dy][x+dx]
 							if neighbor_cell == TILES['ground']:
 								neighbors += neighbor_tile_weight if dy!=dx else diag_tile_weight
 				if cell == TILES['ground']:
 					#die from overpopulation
 					if neighbors < starvation_limit or neighbors > overpop_limit:
-						sim_tiles_step[y][x] = TILES['air']
+						tile_buffer[(r+1)%2][y][x] = TILES['air']
 				elif cell == TILES['air']:
 					#reproduce if at homeostatis
 					if neighbors == birth_limit:
-						sim_tiles_step[y][x] = TILES['ground']
+						tile_buffer[(r+1)%2][y][x] = TILES['ground']
 		#apply changes to simulation step
-		sim_tiles = sim_tiles_step
+		selected_buffer = (r+1)%2
 	#add details
-	for x in range(0, m_w):
-		for y in range(0, m_h):
-			if sim_tiles[y][x] == TILES['ground'] and y+1<m_h and sim_tiles[y+1][x] == TILES['air']:
+	for y in range(0, m_h):
+		for x in range(0, m_w):
+			if tile_buffer[selected_buffer][y][x] == TILES['ground'] and y+1<m_h and tile_buffer[selected_buffer][y+1][x] == TILES['air']:
 				if randf() < 0.5:
-					sim_tiles[y+1][x] = TILES['detail']
-	return sim_tiles
+					tile_buffer[selected_buffer][y+1][x] = TILES['detail']
+	return tile_buffer[selected_buffer]
 
 func _apply_simulation(sim_tiles, start, end):
 	var m_w = end.x - start.x;
@@ -108,3 +119,4 @@ func _apply_simulation(sim_tiles, start, end):
 		for x in range(0, m_w):
 			set_cell(x+start.x, y+start.y, sim_tiles[y][x])
 	update_bitmask_region(start, end)
+	call_deferred('update_dirty_quadrants')

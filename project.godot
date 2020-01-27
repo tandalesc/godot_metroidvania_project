@@ -21,7 +21,6 @@ run/main_scene="res://Scene01.tscn"
 [display]
 
 window/size/resizable=false
-window/size/fullscreen=true
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 

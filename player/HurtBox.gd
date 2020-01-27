@@ -2,7 +2,7 @@ extends Area2D
 
 export (float, 1, 1000) var attack_strength = 300
 
-onready var player = $"../.."
+onready var parent = $"../.."
 onready var collision_shape = $CollisionShape2D
 onready var sparks_node = preload("res://player/effects/Sparks.tscn")
 
@@ -21,7 +21,7 @@ func _physics_process(delta):
 			elif body.is_in_group('bodies'):
 				hurt_rigid_body(body)
 			#generate sparks
-			if body.name == 'Platforms' or body.is_in_group('bodies'):
+			if body.name=='Platforms' or body.name=='RandomizedTileMap' or body.is_in_group('bodies'):
 				#todo improve positioning and responsiveness
 				var sparks = sparks_node.instance()
 				sparks.one_shot = true
@@ -30,8 +30,8 @@ func _physics_process(delta):
 		attack = false
 
 func hurt_rigid_body(body):
-	body.apply_central_impulse((body.global_position-player.global_position).normalized() * player.pushing_force * attack_strength)
+	body.apply_central_impulse((body.global_position-parent.global_position).normalized() * parent.pushing_force * attack_strength)
 
 func hurt_enemy(body):
-	body.impulse += (body.global_position-player.global_position).normalized().rotated(randf()) * 50 * attack_strength
+	body.impulse += (body.global_position-parent.global_position).normalized().rotated(randf()) * 50 * attack_strength
 	body.hurt(attack_strength)

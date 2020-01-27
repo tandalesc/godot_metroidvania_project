@@ -20,19 +20,21 @@ extents = Vector2( 50, 640 )
 
 [node name="RandomMapTest" type="Node2D"]
 script = ExtResource( 1 )
+chunk_size = 16
 
 [node name="RandomizedTileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 16, 16 )
 format = 1
 script = ExtResource( 3 )
-density = 0.55
+density = 0.522
 starvation_limit = 4.6
 birth_limit = 8.0
 overpop_limit = 10.0
-stages = 4
+stages = 3
 
 [node name="Player" parent="." instance=ExtResource( 4 )]
+editor/display_folded = true
 position = Vector2( 290.506, 244.721 )
 
 [node name="AnimationTree" parent="Player" index="1"]
@@ -48,7 +50,6 @@ frame = 2
 [node name="Light2D" type="Light2D" parent="Player"]
 texture = ExtResource( 5 )
 texture_scale = 0.3
-shadow_enabled = true
 shadow_buffer_size = 1024
 shadow_gradient_length = 35.0
 

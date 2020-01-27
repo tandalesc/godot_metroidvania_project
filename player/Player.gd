@@ -4,11 +4,13 @@ const ACCELERATION = 12
 const RUNNING_THRESHOLD = 0.5
 
 const DEFAULT_PUSHING_FORCE = 0
-const DEFAULT_JUMP_STRENGTH = 250
+const DEFAULT_JUMP_STRENGTH = 260
 const DEFAULT_MAX_SPEED = 120
 const DEFAULT_MAX_JUMPS = 1
 const MAX_WALL_RIDE_SPEED = 100
-
+const JUMP_MULTIPLIER_LOW = 2.0
+const JUMP_MULTIPLIER_HIGH = 2.0
+const UNDERWATER_JUMP_STRENGTH = 240
 const UNDERWATER_MAX_SPEED_Y = 40
 const UNDERWATER_MAX_SPEED_X = 45
 
@@ -36,12 +38,10 @@ onready var body = $Body
 func enter_water():
 	underwater = true;
 	max_speed = UNDERWATER_MAX_SPEED_X
-	jump_strength = 180
 
 func exit_water():
 	underwater = false;
 	max_speed = DEFAULT_MAX_SPEED
-	jump_strength = DEFAULT_JUMP_STRENGTH
 
 func accept_power_up(key):
 	match key:
@@ -91,7 +91,7 @@ func process_inputs(gravity, dampening):
 		if anim_name == 'wall_ride':
 			var facing_left = (body.scale.x==-1)
 			velocity.y = 1.1*(-jump_strength)
-			velocity.x = 1.0*(jump_strength if facing_left else -jump_strength)
+			velocity.x = 0.9*(jump_strength if facing_left else -jump_strength)
 			face_direction(body.scale.x * -1)
 			state_machine.start('jump_start')
 	
@@ -164,6 +164,11 @@ func _physics_process(delta):
 	var dampening = space_state.total_linear_damp
 	velocity += gravity
 	process_inputs(gravity, dampening)
+	#multiply gravity depending on input state
+	if velocity.y > 0:
+		velocity += gravity * (JUMP_MULTIPLIER_HIGH-1)
+	elif !is_on_floor() and !Input.is_action_pressed('jump'):
+		velocity += gravity * (JUMP_MULTIPLIER_LOW-1)
 	#clamp vertical movement speed if clinging to wall
 	if state_machine.get_current_node() == 'wall_ride':
 		var clamped_velocity = clamp(velocity.y, 0.0, MAX_WALL_RIDE_SPEED);
@@ -171,7 +176,7 @@ func _physics_process(delta):
 	#dampen all vertical motion in bodies of water
 	if underwater and abs(velocity.y) > UNDERWATER_MAX_SPEED_Y:
 		var clamped_velocity = clamp(velocity.y, -UNDERWATER_MAX_SPEED_Y, UNDERWATER_MAX_SPEED_Y)
-		velocity.y = lerp(velocity.y, clamped_velocity, 0.04)
+		velocity.y = lerp(velocity.y, clamped_velocity, 0.08)
 	#terminal velocity
 	velocity.y = min(velocity.y, 1000)
 	
