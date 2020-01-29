@@ -20,6 +20,7 @@ const diag_tile_weight = 1.1;
 onready var random_map = $".."
 onready var chunk_size = random_map.chunk_size
 
+var prefabs = {}
 var explored_chunks = {}
 var generated_chunks = {}
 const tile_width = 16
@@ -28,20 +29,25 @@ var map_width = chunk_size
 var map_height = chunk_size
 
 func _ready():
-	TILES['ground'] = tile_set.find_tile_by_name(ground_cell)
-	#TILES['air'] = -1;#tile_set.find_tile_by_name(air_cell)
-	TILES['detail'] = tile_set.find_tile_by_name('region3_stalactite')
-	
 	randomize()
+	TILES['ground'] = tile_set.find_tile_by_name(ground_cell)
+	TILES['detail'] = tile_set.find_tile_by_name('region3_stalactite')
+	#read tilemap to get prefabs
+	_update_prefabs(Vector2.ZERO, 'center')
+	_update_prefabs(Vector2.RIGHT, 'tee right')
+	_update_prefabs(Vector2.LEFT, 'tee left')
+	_update_prefabs(Vector2.UP, 'tee up')
+	_update_prefabs(Vector2.UP+Vector2.RIGHT, 'up right')
+	_update_prefabs(Vector2.UP+Vector2.LEFT, 'up left')
+	#generate new maps
 	clear()
-	#loads current position and all neighboring positions
-	extend_if_needed(Vector2.ZERO, true)
+	_place_prefab('tee up', Vector2.ZERO)
 
 func extend_if_needed(expand_dir, recursive=true):
 	var prospective_chunk = random_map.get_player_chunk() + expand_dir
 	if !explored_chunks.has(prospective_chunk):
 		if !generated_chunks.has(prospective_chunk):
-			_generate_region(prospective_chunk)
+			_generate_cellular_automata_region(prospective_chunk)
 		explored_chunks[prospective_chunk] = true
 	if recursive:
 		#check neighboring tiles
@@ -49,35 +55,43 @@ func extend_if_needed(expand_dir, recursive=true):
 			for dx in range(-1,2):
 				var neighbor_chunk = prospective_chunk + Vector2(dx, dy)
 				if !generated_chunks.has(neighbor_chunk):
-					_generate_region(neighbor_chunk)
+					if randi()%3==0:
+						var random_prefab = prefabs.keys()[randi()%len(prefabs.keys())]
+						_place_prefab(random_prefab, neighbor_chunk)
+					else:
+						_generate_cellular_automata_region(neighbor_chunk)
 
-func _generate_region(chunk):
+func _generate_cellular_automata_region(chunk):
 	#stagger chunks every other row to break up inevitable grid
-	var start = Vector2(chunk.x if int(chunk.y)%2==0 else chunk.x-0.5, chunk.y)*chunk_size;
-	var end = Vector2(((chunk.x if int(chunk.y)%2==0 else chunk.x-0.5)+1), (chunk.y+1))*chunk_size;
-	var new_tiles = _simulate(start, end)
-	_apply_simulation(new_tiles, start, end)
+	var start = _stagger_chunk(chunk)*chunk_size
+	var end = start+Vector2.ONE*chunk_size
+	var buffer = _create_tile_buffer(end-start)
+	_randomly_populate_region(buffer, start, end)
+	buffer = _simulate_cellular_automata(buffer, start, end)
+	_add_details(buffer, start, end)
+	_apply_simulation(buffer, start, end)
 	if !generated_chunks.has(chunk):
 		generated_chunks[chunk] = true
 
+func _randomly_populate_region(buffer, start, end):
+	var m_w = end.x - start.x;
+	var m_h = end.y - start.y;
+	for y in range(0, m_h):
+		for x in range(0, m_w):
+			if randf()<density:
+				buffer[y][x] = TILES['ground']
+			else:
+				buffer[y][x] = TILES['air']
+
 #generate using cellular automata
 #inspired by https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
-func _simulate(start, end):
-	var m_w = end.x - start.x
-	var m_h = end.y - start.y
-	var tile_buffer = [[], []]
-	#fill in buffer 0
-	for y in range(0, m_h):
-		var row = []
-		for x in range(0, m_w):
-			if density > randf():
-				row.append(TILES['ground'])
-			else:
-				row.append(TILES['air'])
-		tile_buffer[0].append(row)
+func _simulate_cellular_automata(buffer, start, end, repititions=stages):
+	var m_w = end.x - start.x;
+	var m_h = end.y - start.y;
+	var tile_buffer = [buffer, []]
 	var selected_buffer = 0
 	#process repetitions of conway's game of life
-	for r in range(stages):
+	for r in range(repititions):
 		#maintain two copies so we keep our data input clean
 		tile_buffer[(r+1)%2] = tile_buffer[r%2].duplicate(true)
 		for y in range(0, m_h):
@@ -103,13 +117,51 @@ func _simulate(start, end):
 						tile_buffer[(r+1)%2][y][x] = TILES['ground']
 		#apply changes to simulation step
 		selected_buffer = (r+1)%2
-	#add details
+	var simulated_tiles = tile_buffer[(selected_buffer+1)%2]
+	#copy data back to original buffer if necessary
+	return simulated_tiles
+
+func _place_prefab(prefab_name, map_chunk):
+	var start = _stagger_chunk(map_chunk)*chunk_size
+	var end = start+Vector2.ONE*chunk_size
+	var prefab = prefabs[prefab_name].duplicate(true)
+	_add_details(prefab, start, end)
+	_apply_simulation(prefab, start, end)
+	if !generated_chunks.has(map_chunk):
+		generated_chunks[map_chunk] = true
+
+func _update_prefabs(prefab_chunk, prefab_name):
+	var start = prefab_chunk*chunk_size
+	var end = start+Vector2.ONE*chunk_size
+	var tile_buffer = []
+	for y in range(start.y, end.y):
+		var row = []
+		for x in range(start.x, end.x):
+			row.append(get_cell(x, y))
+		tile_buffer.append(row)
+	prefabs[prefab_name] = tile_buffer
+
+func _add_details(buffer, start, end):
+	var m_w = end.x - start.x;
+	var m_h = end.y - start.y;
 	for y in range(0, m_h):
 		for x in range(0, m_w):
-			if tile_buffer[selected_buffer][y][x] == TILES['ground'] and y+1<m_h and tile_buffer[selected_buffer][y+1][x] == TILES['air']:
+			if buffer[y][x] == TILES['ground'] and y+1<m_h and buffer[y+1][x] == TILES['air']:
 				if randf() < 0.5:
-					tile_buffer[selected_buffer][y+1][x] = TILES['detail']
-	return tile_buffer[selected_buffer]
+					buffer[y+1][x] = TILES['detail']
+
+func _stagger_chunk(map_chunk):
+	var staggered_chunk = map_chunk if int(map_chunk.y)%2==0 else map_chunk-Vector2.RIGHT*0.5
+	return staggered_chunk
+
+func _create_tile_buffer(size):
+	var buffer = []
+	for y in range(0, size.y):
+		var row = []
+		for x in range(0, size.x):
+			row.append(TILES['air'])
+		buffer.append(row)
+	return buffer
 
 func _apply_simulation(sim_tiles, start, end):
 	var m_w = end.x - start.x;

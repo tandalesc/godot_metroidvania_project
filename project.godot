@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Metroidvania Project"
-run/main_scene="res://Scene01.tscn"
+run/main_scene="res://random_map/RandomMapTest.tscn"
 
 [display]
 
