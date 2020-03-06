@@ -30,14 +30,13 @@ stages = 4
 visible = false
 
 [node name="Player" parent="." instance=ExtResource( 5 )]
-editor/display_folded = true
 position = Vector2( 132.504, 134.935 )
 
 [node name="AnimationTree" parent="Player" index="1"]
 parameters/playback = SubResource( 1 )
 
 [node name="Camera2D" parent="Player" index="3"]
-zoom = Vector2( 0.6, 0.6 )
+zoom = Vector2( 0.5, 0.5 )
 smoothing_enabled = false
 
 [node name="Sprite" parent="Player/Body" index="3"]

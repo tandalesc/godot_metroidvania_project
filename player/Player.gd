@@ -4,14 +4,14 @@ const ACCELERATION = 12
 const RUNNING_THRESHOLD = 0.5
 
 const DEFAULT_PUSHING_FORCE = 0
-const DEFAULT_JUMP_STRENGTH = 260
+const DEFAULT_JUMP_STRENGTH = 350
 const DEFAULT_MAX_SPEED = 120
 const DEFAULT_MAX_JUMPS = 1
 const MAX_WALL_RIDE_SPEED = 100
 const JUMP_MULTIPLIER_LOW = 2.0
 const JUMP_MULTIPLIER_HIGH = 2.0
 const UNDERWATER_JUMP_STRENGTH = 240
-const UNDERWATER_MAX_SPEED_Y = 40
+const UNDERWATER_MAX_SPEED_Y = 45
 const UNDERWATER_MAX_SPEED_X = 45
 
 var pushing_force = DEFAULT_PUSHING_FORCE
@@ -29,18 +29,27 @@ var pause_movement = false
 var jumps_taken = 0
 var attack_timer = 0
 var underwater = false
+var was_on_floor = false
 var velocity = Vector2()
 
 onready var joystick = $"../TouchscreenControls/JoystickGroup/JoystickBase/Joystick"
+onready var underwater_timer = $UnderwaterTimer
+onready var hang_timer = $HangTimer
 onready var state_machine = $AnimationTree['parameters/playback']
 onready var body = $Body
 
-func enter_water():
+func enter_water(show_bubbles):
 	underwater = true;
+	if show_bubbles: 
+		underwater_timer.start()
+	#make hitting the water slow you down instantly
+	if velocity.y > UNDERWATER_MAX_SPEED_Y:
+		velocity.y = UNDERWATER_MAX_SPEED_Y
 	max_speed = UNDERWATER_MAX_SPEED_X
 
 func exit_water():
 	underwater = false;
+	underwater_timer.stop()
 	max_speed = DEFAULT_MAX_SPEED
 
 func accept_power_up(key):
@@ -83,15 +92,15 @@ func process_inputs(gravity, dampening):
 	if jump_pressed:
 		if player_state == State.ATTACK:
 			state_machine.travel('sheath_sword')
-		elif is_on_floor() or jumps_taken < max_jumps:
+		elif (is_on_floor() or hang_timer.time_left>0) or jumps_taken < max_jumps:
 			#allow multiple jumps upto a soft limit
 			jumps_taken += 1
 			velocity.y = -jump_strength
 			state_machine.start('jump_start')
 		if anim_name == 'wall_ride':
 			var facing_left = (body.scale.x==-1)
-			velocity.y = 1.1*(-jump_strength)
-			velocity.x = 0.9*(jump_strength if facing_left else -jump_strength)
+			velocity.y = 1.3*(-jump_strength)
+			velocity.x = 0.65*(jump_strength if facing_left else -jump_strength)
 			face_direction(body.scale.x * -1)
 			state_machine.start('jump_start')
 	
@@ -131,6 +140,7 @@ func update_animations():
 		if player_state == State.ATTACK:
 			state_machine.travel('sheath_sword')
 		else:
+			if hang_timer.is_stopped(): hang_timer.start()
 			state_machine.start('jump_peak')
 		#allow user one extra jump, no more
 		jumps_taken += 1
@@ -172,7 +182,7 @@ func _physics_process(delta):
 	#clamp vertical movement speed if clinging to wall
 	if state_machine.get_current_node() == 'wall_ride':
 		var clamped_velocity = clamp(velocity.y, 0.0, MAX_WALL_RIDE_SPEED);
-		velocity.y = lerp(velocity.y, clamped_velocity, 0.3);
+		velocity.y = lerp(velocity.y, clamped_velocity, 0.4);
 	#dampen all vertical motion in bodies of water
 	if underwater and abs(velocity.y) > UNDERWATER_MAX_SPEED_Y:
 		var clamped_velocity = clamp(velocity.y, -UNDERWATER_MAX_SPEED_Y, UNDERWATER_MAX_SPEED_Y)
@@ -190,3 +200,10 @@ func _physics_process(delta):
 		if collision.collider.is_in_group('bodies'):
 			collision.collider.apply_central_impulse(-collision.normal * pushing_force)
 	
+
+
+func _on_UnderwaterTimer_timeout():
+	if underwater:
+		print('pop')
+		#make bubble particles
+		underwater_timer.start()

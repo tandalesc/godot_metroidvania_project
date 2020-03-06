@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Metroidvania Project"
-run/main_scene="res://random_map/RandomMapTest.tscn"
+run/main_scene="res://01_RainyCave.tscn"
 
 [display]
 
@@ -63,13 +63,20 @@ jump={
 
 [physics]
 
+2d/thread_model=2
 2d/default_gravity=10
 2d/default_linear_damp=0.4
 
 [rendering]
 
-quality/intended_usage/framebuffer_allocation=0
+quality/intended_usage/framebuffer_allocation.mobile=2
 quality/2d/use_pixel_snap=true
-quality/shading/force_vertex_shading=true
+threads/thread_model=2
+quality/directional_shadow/size=2048
+quality/shadow_atlas/size=2048
+quality/shadows/filter_mode=0
+quality/reflections/texture_array_reflections=false
+quality/reflections/high_quality_ggx=false
 environment/default_clear_color=Color( 0.0627451, 0.0627451, 0.0627451, 1 )
+quality/reflections/atlas_size=512
 environment/default_environment="res://default_env.tres"

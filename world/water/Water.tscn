@@ -1,54 +1,36 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://world/water/WaterArea.gd" type="Script" id=1]
 [ext_resource path="res://world/water/water.shader" type="Shader" id=2]
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 255.75, 109.879 )
-
-[sub_resource type="ShaderMaterial" id=2]
+[sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 2 )
-shader_param/tint = Color( 0, 0.705882, 1, 0.458824 )
+shader_param/tint = Color( 0, 0.705882, 1, 0.505882 )
 shader_param/uv_scale = 6.0
 shader_param/time_scale = 1.0
 shader_param/brightness = 1.5
 shader_param/fbm_octaves = 5
 shader_param/fbm_scale = 0.65
 
-[sub_resource type="Gradient" id=3]
-offsets = PoolRealArray( 0.116129, 0.309677 )
+[sub_resource type="QuadMesh" id=2]
+size = Vector2( 511.5, -219.758 )
 
-[sub_resource type="GradientTexture" id=4]
-gradient = SubResource( 3 )
-width = 200
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 255.75, 109.879 )
 
 [node name="Water" type="Area2D"]
-position = Vector2( -33.0328, 283.463 )
+material = SubResource( 1 )
 z_index = 2
 space_override = 3
 gravity = 5.5
 linear_damp = 0.8
 script = ExtResource( 1 )
 
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+use_parent_material = true
+mesh = SubResource( 2 )
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 position = Vector2( 2.25357, 35.4332 )
-shape = SubResource( 1 )
-
-[node name="UnderwaterEffect" type="ColorRect" parent="."]
-light_mask = 0
-material = SubResource( 2 )
-margin_left = -253.678
-margin_top = -75.0
-margin_right = 257.322
-margin_bottom = 148.0
-
-[node name="UnderwaterLighting" type="Light2D" parent="."]
-position = Vector2( -2.58667, -21.0376 )
-rotation = 1.5708
-scale = Vector2( 1.22616, 423.963 )
-texture = SubResource( 4 )
-offset = Vector2( -0.101715, -0.00335693 )
-color = Color( 0.184314, 0.505882, 0.917647, 1 )
-energy = 0.9
-shadow_gradient_length = 2.0
+shape = SubResource( 3 )

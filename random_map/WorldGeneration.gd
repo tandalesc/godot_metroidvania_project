@@ -73,15 +73,25 @@ func _generate_cellular_automata_region(chunk):
 	if !generated_chunks.has(chunk):
 		generated_chunks[chunk] = true
 
-func _randomly_populate_region(buffer, start, end):
-	var m_w = end.x - start.x;
-	var m_h = end.y - start.y;
-	for y in range(0, m_h):
-		for x in range(0, m_w):
-			if randf()<density:
-				buffer[y][x] = TILES['ground']
-			else:
-				buffer[y][x] = TILES['air']
+func _place_prefab(prefab_name, map_chunk):
+	var start = _stagger_chunk(map_chunk)*chunk_size
+	var end = start+Vector2.ONE*chunk_size
+	var prefab = prefabs[prefab_name].duplicate(true)
+	_add_details(prefab, start, end)
+	_apply_simulation(prefab, start, end)
+	if !generated_chunks.has(map_chunk):
+		generated_chunks[map_chunk] = true
+
+func _update_prefabs(prefab_chunk, prefab_name):
+	var start = prefab_chunk*chunk_size
+	var end = start+Vector2.ONE*chunk_size
+	var tile_buffer = []
+	for y in range(start.y, end.y):
+		var row = []
+		for x in range(start.x, end.x):
+			row.append(get_cell(x, y))
+		tile_buffer.append(row)
+	prefabs[prefab_name] = tile_buffer
 
 #generate using cellular automata
 #inspired by https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
@@ -121,26 +131,6 @@ func _simulate_cellular_automata(buffer, start, end, repititions=stages):
 	#copy data back to original buffer if necessary
 	return simulated_tiles
 
-func _place_prefab(prefab_name, map_chunk):
-	var start = _stagger_chunk(map_chunk)*chunk_size
-	var end = start+Vector2.ONE*chunk_size
-	var prefab = prefabs[prefab_name].duplicate(true)
-	_add_details(prefab, start, end)
-	_apply_simulation(prefab, start, end)
-	if !generated_chunks.has(map_chunk):
-		generated_chunks[map_chunk] = true
-
-func _update_prefabs(prefab_chunk, prefab_name):
-	var start = prefab_chunk*chunk_size
-	var end = start+Vector2.ONE*chunk_size
-	var tile_buffer = []
-	for y in range(start.y, end.y):
-		var row = []
-		for x in range(start.x, end.x):
-			row.append(get_cell(x, y))
-		tile_buffer.append(row)
-	prefabs[prefab_name] = tile_buffer
-
 func _add_details(buffer, start, end):
 	var m_w = end.x - start.x;
 	var m_h = end.y - start.y;
@@ -162,6 +152,16 @@ func _create_tile_buffer(size):
 			row.append(TILES['air'])
 		buffer.append(row)
 	return buffer
+
+func _randomly_populate_region(buffer, start, end):
+	var m_w = end.x - start.x;
+	var m_h = end.y - start.y;
+	for y in range(0, m_h):
+		for x in range(0, m_w):
+			if randf()<density:
+				buffer[y][x] = TILES['ground']
+			else:
+				buffer[y][x] = TILES['air']
 
 func _apply_simulation(sim_tiles, start, end):
 	var m_w = end.x - start.x;

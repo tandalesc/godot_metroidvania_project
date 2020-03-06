@@ -429,7 +429,7 @@ graph_offset = Vector2( 0, -67.5965 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=48]
 
-[sub_resource type="CapsuleShape2D" id=53]
+[sub_resource type="CapsuleShape2D" id=49]
 radius = 7.7671
 height = 14.358
 
@@ -469,11 +469,12 @@ parameters/playback = SubResource( 48 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 position = Vector2( -0.143909, 1.95186 )
-shape = SubResource( 53 )
+shape = SubResource( 49 )
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
 zoom = Vector2( 0.35, 0.35 )
+drag_margin_h_enabled = true
 smoothing_enabled = true
 smoothing_speed = 15.0
 drag_margin_left = 0.1
@@ -484,7 +485,6 @@ drag_margin_bottom = 0.15
 [node name="Body" type="Node2D" parent="."]
 
 [node name="Attack1_HurtBox" type="Area2D" parent="Body"]
-editor/display_folded = true
 script = ExtResource( 2 )
 attack_strength = 10.0
 
@@ -494,7 +494,6 @@ position = Vector2( 10.5831, -3.08632 )
 shape = SubResource( 50 )
 
 [node name="Attack2_HurtBox" type="Area2D" parent="Body"]
-editor/display_folded = true
 script = ExtResource( 2 )
 attack_strength = 20.0
 
@@ -517,6 +516,7 @@ shape = SubResource( 52 )
 texture = ExtResource( 3 )
 vframes = 16
 hframes = 7
+frame = 1
 region_enabled = true
 region_rect = Rect2( 0, 0, 350, 592 )
 
@@ -527,3 +527,12 @@ z_index = 1
 position = Vector2( 16.3783, 2.66959 )
 randomness = 0.4
 fract_delta = false
+
+[node name="UnderwaterTimer" type="Timer" parent="."]
+wait_time = 3.5
+one_shot = true
+
+[node name="HangTimer" type="Timer" parent="."]
+process_mode = 0
+one_shot = true
+[connection signal="timeout" from="UnderwaterTimer" to="." method="_on_UnderwaterTimer_timeout"]
