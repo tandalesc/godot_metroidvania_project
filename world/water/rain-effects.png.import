@@ -1,0 +1,13 @@
+[remap]
+
+importer="image"
+type="Image"
+path="res://.import/rain-effects.png-cfca57add13edc071f7b86842a2ed485.image"
+
+[deps]
+
+source_file="res://world/water/rain-effects.png"
+dest_files=[ "res://.import/rain-effects.png-cfca57add13edc071f7b86842a2ed485.image" ]
+
+[params]
+

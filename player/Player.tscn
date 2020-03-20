@@ -528,11 +528,16 @@ position = Vector2( 16.3783, 2.66959 )
 randomness = 0.4
 fract_delta = false
 
+[node name="HeadPosition" type="Position2D" parent="Body"]
+position = Vector2( 0.904686, -7.46367 )
+
 [node name="UnderwaterTimer" type="Timer" parent="."]
 wait_time = 3.5
 one_shot = true
 
 [node name="HangTimer" type="Timer" parent="."]
 process_mode = 0
+wait_time = 0.2
 one_shot = true
 [connection signal="timeout" from="UnderwaterTimer" to="." method="_on_UnderwaterTimer_timeout"]
+[connection signal="timeout" from="HangTimer" to="." method="_on_HangTimer_timeout"]

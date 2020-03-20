@@ -4,12 +4,12 @@ const ACCELERATION = 12
 const RUNNING_THRESHOLD = 0.5
 
 const DEFAULT_PUSHING_FORCE = 0
-const DEFAULT_JUMP_STRENGTH = 350
+const DEFAULT_JUMP_STRENGTH = 300
 const DEFAULT_MAX_SPEED = 120
-const DEFAULT_MAX_JUMPS = 1
+const DEFAULT_MAX_JUMPS = 3
 const MAX_WALL_RIDE_SPEED = 100
-const JUMP_MULTIPLIER_LOW = 2.0
-const JUMP_MULTIPLIER_HIGH = 2.0
+const JUMP_MULTIPLIER_LOW = 1.5
+const JUMP_MULTIPLIER_HIGH = 1.7
 const UNDERWATER_JUMP_STRENGTH = 240
 const UNDERWATER_MAX_SPEED_Y = 45
 const UNDERWATER_MAX_SPEED_X = 45
@@ -29,19 +29,20 @@ var pause_movement = false
 var jumps_taken = 0
 var attack_timer = 0
 var underwater = false
+var head_under_water = false
 var was_on_floor = false
 var velocity = Vector2()
 
 onready var joystick = $"../TouchscreenControls/JoystickGroup/JoystickBase/Joystick"
+onready var head_position = $Body/HeadPosition
 onready var underwater_timer = $UnderwaterTimer
 onready var hang_timer = $HangTimer
 onready var state_machine = $AnimationTree['parameters/playback']
 onready var body = $Body
 
-func enter_water(show_bubbles):
+func enter_water():
 	underwater = true;
-	if show_bubbles: 
-		underwater_timer.start()
+	underwater_timer.start()
 	#make hitting the water slow you down instantly
 	if velocity.y > UNDERWATER_MAX_SPEED_Y:
 		velocity.y = UNDERWATER_MAX_SPEED_Y
@@ -92,7 +93,7 @@ func process_inputs(gravity, dampening):
 	if jump_pressed:
 		if player_state == State.ATTACK:
 			state_machine.travel('sheath_sword')
-		elif (is_on_floor() or hang_timer.time_left>0) or jumps_taken < max_jumps:
+		elif ((is_on_floor() or hang_timer.time_left>0) and jumps_taken < max_jumps) or jumps_taken < max_jumps:
 			#allow multiple jumps upto a soft limit
 			jumps_taken += 1
 			velocity.y = -jump_strength
@@ -142,8 +143,6 @@ func update_animations():
 		else:
 			if hang_timer.is_stopped(): hang_timer.start()
 			state_machine.start('jump_peak')
-		#allow user one extra jump, no more
-		jumps_taken += 1
 		
 	if player_state == State.ATTACK:
 		#end attack stance, go back to idle
@@ -160,7 +159,6 @@ func animation_finished(anim_name):
 	elif anim_name == 'draw_sword':
 		player_state = State.ATTACK
 		state_machine.travel('attack_stance')
-		
 
 func _process(delta):
 	update_animations()
@@ -169,9 +167,10 @@ func _physics_process(delta):
 	if pause_movement:
 		return
 	#fetch totaled values for gravity and dampening, inclusive of any area modifications
-	var space_state = Physics2DServer.body_get_direct_state(get_rid())
-	var gravity = space_state.total_gravity
-	var dampening = space_state.total_linear_damp
+	var body_state = Physics2DServer.body_get_direct_state(get_rid())
+	var space_state = get_world_2d().direct_space_state
+	var gravity = body_state.total_gravity
+	var dampening = body_state.total_linear_damp
 	velocity += gravity
 	process_inputs(gravity, dampening)
 	#multiply gravity depending on input state
@@ -194,6 +193,16 @@ func _physics_process(delta):
 	#parameters: ground normal, stop on slope, max bounces, max slope angle, infinite intertia
 	velocity = move_and_slide(velocity, Vector2.UP, true, 4, PI/4, false)
 	
+	#check if head is underwater
+	if underwater:
+		var head_pos_scan_result = space_state.intersect_point(head_position.global_position, 8, [self], collision_mask, false, true)
+		head_under_water = false
+		if not head_pos_scan_result.empty():
+			for result in head_pos_scan_result:
+				var collider = result.collider
+				if collider.is_in_group('water'):
+					head_under_water = true
+	
 	#apply pushing force to rigid bodies
 	for index in get_slide_count():
 		var collision = get_slide_collision(index)
@@ -203,7 +212,11 @@ func _physics_process(delta):
 
 
 func _on_UnderwaterTimer_timeout():
-	if underwater:
+	if underwater and head_under_water:
 		print('pop')
 		#make bubble particles
 		underwater_timer.start()
+
+
+func _on_HangTimer_timeout():
+	jumps_taken += 1
