@@ -5,8 +5,8 @@ const float EPS = 0.0000001;
 
 uniform vec2 rain_speed = vec2(0.613, -16.0);
 //use prime numbers
-uniform vec2 rain_layer_1_scale = vec2(53.0, 31.0);
-uniform vec2 rain_layer_2_scale = vec2(59.0, 37.0);
+uniform vec2 rain_layer_1_scale = vec2(53.0, 41.0);
+uniform vec2 rain_layer_2_scale = vec2(59.0, 43.0);
 uniform sampler2D rain_tex;
 uniform sampler2D noise;
 uniform vec4 tint_color: hint_color;
@@ -37,7 +37,11 @@ void fragment() {
 	vec4 screen_color = textureLod(SCREEN_TEXTURE, SCREEN_UV, fog_effect);
 	
 	//measures distance from center on x axis
-	float central_measure = clamp(pow(gaussian(UV.x, 0.45, 0.45)+0.15, 2.0), 0.0, 1.0);
+	float fade_top = 0.15;
+	float central_measure = clamp(pow(gaussian(UV.x, 0.45, 0.45)+0.25, 3.8), 0.0, 1.0);
+	if(1.0-UV.y < fade_top) {
+		central_measure = mix(0.0, central_measure, (1.0-UV.y)/fade_top)
+	}
 	//use two noise samples to calculate where fog volumes should exist
 	float adj_noise = max(tex_noise.r, tex_noise_2.r)+0.4;
 	adj_noise = clamp(pow(adj_noise-0.1, 2.0), 0.0, 1.0);

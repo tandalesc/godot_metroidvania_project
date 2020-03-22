@@ -6,7 +6,7 @@ const RUNNING_THRESHOLD = 0.5
 const DEFAULT_PUSHING_FORCE = 0
 const DEFAULT_JUMP_STRENGTH = 300
 const DEFAULT_MAX_SPEED = 120
-const DEFAULT_MAX_JUMPS = 3
+const DEFAULT_MAX_JUMPS = 1
 const MAX_WALL_RIDE_SPEED = 100
 const JUMP_MULTIPLIER_LOW = 1.5
 const JUMP_MULTIPLIER_HIGH = 1.7
@@ -28,6 +28,8 @@ var player_state = State.MOVEMENT
 var pause_movement = false
 var jumps_taken = 0
 var attack_timer = 0
+var lookup_timer = 0
+var lookdown_timer = 0
 var underwater = false
 var head_under_water = false
 var was_on_floor = false
@@ -37,6 +39,8 @@ onready var joystick = $"../TouchscreenControls/JoystickGroup/JoystickBase/Joyst
 onready var head_position = $Body/HeadPosition
 onready var underwater_timer = $UnderwaterTimer
 onready var hang_timer = $HangTimer
+onready var camera = $Camera2D
+onready var effects = $Body/Effects
 onready var state_machine = $AnimationTree['parameters/playback']
 onready var body = $Body
 
@@ -66,20 +70,27 @@ func face_direction(dir):
 	if dir != body.scale.x:
 		body.set_scale(Vector2(dir, 1))
 
-func process_inputs(gravity, dampening):
+func process_inputs(gravity, dampening, dt):
 	var analog_input = Vector2.ZERO if joystick==null else joystick.get_value()
 	if Input.is_action_pressed('ui_right'):
 		analog_input += Vector2.RIGHT
 	if Input.is_action_pressed('ui_left'):
 		analog_input += Vector2.LEFT
+	if Input.is_action_pressed('ui_up'):
+		analog_input += Vector2.DOWN
+	if Input.is_action_pressed('ui_down'):
+		analog_input += Vector2.UP
 	var right_pressed = analog_input.x > 0
 	var left_pressed = analog_input.x < 0
+	var up_pressed = analog_input.y > 0
+	var down_pressed = analog_input.y < 0
 	var jump_pressed = Input.is_action_just_pressed('jump')
 	var attack_pressed = Input.is_action_just_pressed('attack')
 	var anim_name = state_machine.get_current_node()
 	#different speed multipliers for each stance the player is in
 	var speed_multiplier = max_speed/5 if player_state==State.ATTACK else max_speed
 	var input_fade = pow(abs(analog_input.x), 2)
+	var y_dir_not_pressed = not up_pressed and not down_pressed
 
 	if right_pressed:
 		face_direction(1)
@@ -89,6 +100,23 @@ func process_inputs(gravity, dampening):
 		velocity.x = max(velocity.x-ACCELERATION, -speed_multiplier)*input_fade
 	else:
 		velocity.x = lerp(velocity.x, 0, dampening if is_on_floor() else 2*dampening/3)
+		camera.look_x(0)
+		#loop up and down
+		if up_pressed:
+			lookup_timer += dt
+			if lookup_timer > 0.7:
+				camera.look_y(-70.0)
+		elif lookup_timer > 0:
+			lookup_timer = 0
+		if down_pressed:
+			lookdown_timer += dt
+			if lookdown_timer > 0.7:
+				camera.look_y(50.0)
+		elif lookdown_timer > 0:
+			lookdown_timer = 0
+	#reset camera position if not looking up or down
+	if y_dir_not_pressed:
+		camera.look_y(-20.0)
 		
 	if jump_pressed:
 		if player_state == State.ATTACK:
@@ -172,7 +200,7 @@ func _physics_process(delta):
 	var gravity = body_state.total_gravity
 	var dampening = body_state.total_linear_damp
 	velocity += gravity
-	process_inputs(gravity, dampening)
+	process_inputs(gravity, dampening, delta)
 	#multiply gravity depending on input state
 	if velocity.y > 0:
 		velocity += gravity * (JUMP_MULTIPLIER_HIGH-1)
@@ -213,7 +241,7 @@ func _physics_process(delta):
 
 func _on_UnderwaterTimer_timeout():
 	if underwater and head_under_water:
-		print('pop')
+		effects.create_bubbles()
 		#make bubble particles
 		underwater_timer.start()
 

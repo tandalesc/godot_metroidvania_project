@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/low_hum.ogg-2095fccaf600ec3fb3facc729395288b.oggstr"
+
+[deps]
+
+source_file="res://world/sounds/low_hum.ogg"
+dest_files=[ "res://.import/low_hum.ogg-2095fccaf600ec3fb3facc729395288b.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

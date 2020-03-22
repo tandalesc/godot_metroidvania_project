@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/underwater_sounds.ogg-5f9248e14f2c6bb25bd50f105ebecd26.oggstr"
+
+[deps]
+
+source_file="res://world/sounds/underwater_sounds.ogg"
+dest_files=[ "res://.import/underwater_sounds.ogg-5f9248e14f2c6bb25bd50f105ebecd26.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

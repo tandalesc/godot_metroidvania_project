@@ -1,6 +1,4 @@
-[gd_scene load_steps=3 format=2]
-
-[ext_resource path="res://player/effects/Sparks.gd" type="Script" id=1]
+[gd_scene load_steps=2 format=2]
 
 [sub_resource type="ParticlesMaterial" id=1]
 emission_shape = 2
@@ -18,14 +16,15 @@ damping_random = 1.0
 angle_random = 0.5
 scale = 2.0
 scale_random = 0.8
+color = Color( 0.894118, 0.886275, 0.862745, 1 )
 
 [node name="Sparks" type="Particles2D"]
-z_index = 1
+position = Vector2( 9, 3 )
 emitting = false
 amount = 7
 one_shot = true
 explosiveness = 0.8
 randomness = 0.3
+fract_delta = false
 local_coords = false
 process_material = SubResource( 1 )
-script = ExtResource( 1 )
